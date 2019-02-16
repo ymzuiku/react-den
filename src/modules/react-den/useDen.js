@@ -50,20 +50,37 @@ export default function useDen({
   interval = 0,
 }) {
   const [value, setValue] = React.useState({ loading: false, error: void 0, data: void 0 });
-  let clearThrottles = void 0;
+  const [clearTimer, setClearTimer] = React.useState(void 0);
+  let timer = void 0;
 
-  function updateValue(
+  const updateValue = (
     {
-      data: nextData = void 0,
-      body: nextBody = void 0,
-      variables: nextVariables = void 0,
-      loading: nextLoading = false,
-      error: nextError = void 0,
+      data: nextData = data,
+      body: nextBody = body,
+      variables: nextVariables = variables,
+      loading: nextLoading = loading,
+      error: nextError = error,
       optimistic: nextOptimistic = null,
       getBody: nextGetBody = getBody,
+      once: nextOnce = once,
     },
     subKey,
-  ) {
+  ) => {
+    const key = path.join(',');
+
+    // 若有once, 并且设定了节流器, 则进行拦截
+    if (nextOnce && cache.throttles[key]) {
+      return;
+    }
+    // 若无once, 并且设定了节流器, 则清理节流器
+    if (!nextOnce && cache.throttles[key]) {
+      delete cache.throttles[key];
+    }
+    // 如果以上条件不满足, 并且没有设定过节流器, 则设定节流器
+    else if (!cache.throttles[key]) {
+      cache.throttles[key] = true;
+    }
+
     // 根据传入类型来判断 kind
     if (!kind) {
       if (gql) {
@@ -75,18 +92,18 @@ export default function useDen({
       }
     }
 
-    const key = path.join(',');
-
     // 初始化当前 path 的 use
     if (!cache.setStateFunctions[key]) {
       cache.setStateFunctions[key] = {};
     }
+
     // 初始化当前use的setState
     if (subKey && !cache.setStateFunctions[key][subKey]) {
       cache.setStateFunctions[key][subKey] = () => {
         setValue(cache.getIn(path));
       };
     }
+
     // 保存乐观之前的数据, 用于乐观失败还原
     const oldState = cache.getIn(path) || {};
 
@@ -96,10 +113,12 @@ export default function useDen({
     } else if (kind !== 'memory') {
       cache.setIn(path, { loading: true });
     }
+
     // 更新本地状态
     else {
       cache.setIn(path, { data: fixDataGetter(dataGetter, nextData), loading: nextLoading, error: nextError });
     }
+
     // 同步注册的页面进行更新
     for (const k in cache.setStateFunctions[key]) {
       cache.setStateFunctions[key][k]();
@@ -137,37 +156,36 @@ export default function useDen({
         }
       });
     }
-  }
+  };
   React.useEffect(() => {
-    if (cache.isDev) {
-      if (!path || path.length === 0) {
-        throw new Error('[useAffinity] path is empty');
-      }
+    if (cache.isDev && (!path || path.length === 0)) {
+      throw new Error('[useAffinity] path is empty');
     }
-    const key = path.join(',');
     SUB_KEY++;
     const subKey = SUB_KEY;
-    if (once && !cache.throttles[key]) {
-      updateValue({ data, variables, body, loading, error, optimistic }, subKey);
-      cache.throttles[key] = true;
-      clearThrottles = () => {
-        delete cache.throttles[key];
-      };
-    } else if (interval > 0) {
-      const timer = setInterval(() => {
-        updateValue({ data, variables, body, loading, error, optimistic }, subKey);
+    updateValue({ once, interval, data, variables, body, loading, error, optimistic }, subKey);
+
+    if (interval > 0) {
+      timer = setInterval(() => {
+        updateValue({ once, interval, data, variables, body, loading, error, optimistic }, subKey);
       }, interval);
-      clearThrottles = () => {
+
+      setClearTimer(() => () => {
         clearInterval(timer);
-      };
+        timer = void 0;
+      });
     } else {
-      updateValue({ data, variables, body, loading, error, optimistic }, subKey);
+      updateValue({ once, interval, data, variables, body, loading, error, optimistic }, subKey);
     }
 
     // 当组件释放后, 释放setStateFunctions中的setState
     return () => {
+      const key = path.join(',');
+
+      // 清空循环请求
+      clearTimer();
       delete cache.setStateFunctions[key][subKey];
     };
   }, []);
-  return [value, updateValue, clearThrottles];
+  return [value, updateValue, clearTimer];
 }
