@@ -1,0 +1,9 @@
+{
+  "name": "redux-saga-helper",
+  "author": "pillar",
+  "version": "0.0.1",
+  "dependencies": {
+    "redux": "^0.0.1",
+    "redux-saga": "^0.0.1"
+  }
+}

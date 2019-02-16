@@ -1,6 +1,38 @@
+## Install
+
+copy this code to Terminal, and change `<your-project>` string
+
+```sh
+react-project-gui(){
+  git clone -o react-project-gui -b $1 --single-branch git@github.com:ymzuiku/react-project-gui.git $2 &&
+  cd $2 && yarn && yarn dll && yarn start
+}
+react-project-gui master your-project
+```
+
+Wait done, then open http://127.0.0.1:3100
+
+## Use
+
+Run dev project
+
+```sh
+$ yarn dll # need run once
+$ yarn start
+```
+
+Build Product projcet
+
+```
+$ yarn build
+```
+
+## License
+
+```
 MIT License
 
-Copyright (c) 2019 Pillar.Liang
+Copyright (c) 2013-present, Facebook, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +51,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
