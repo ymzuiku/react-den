@@ -2,8 +2,10 @@
 export default function(url, params) {
   // /test-dog/{user}?name&age to /test-dog/xiaoming?name=dog&age=500
   let nextUrl = url;
+
   if (/\?/.test(nextUrl)) {
     const list = url.split('?');
+
     for (const k in params) {
       list[1] = list[1].replace(k, `${k}=${params[k]}`);
     }

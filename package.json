@@ -138,7 +138,7 @@
   ],
   "jest": {
     "collectCoverageFrom": [
-      "src/modules/react-den/*.{js,jsx,ts,tsx}",
+      "<rootDir>/src/modules/react-den/*.{js,jsx,ts,tsx}",
       "!src/**/*.d.ts"
     ],
     "resolver": "jest-pnp-resolver",
@@ -186,6 +186,16 @@
     "plugins": [
       "babel-plugin-styled-components",
       [
+        "babel-plugin-named-asset-import",
+        {
+          "loaderMap": {
+            "svg": {
+              "ReactComponent": "@svgr/webpack?-prettier,-svgo![path]"
+            }
+          }
+        }
+      ],
+      [
         "@babel/plugin-proposal-optional-chaining",
         {
           "loose": false
@@ -212,6 +222,9 @@
       [
         "module-resolver",
         {
+          "root": [
+            "./"
+          ],
           "alias": {
             "src": "./src",
             "modules": "./src/modules"

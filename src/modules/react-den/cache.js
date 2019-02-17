@@ -1,5 +1,5 @@
 import { Map } from 'immutable';
-import isDev from 'packages/pures/isDev';
+import isDev from 'modules/pures/isDev';
 
 /** 如果子路径没有,就补齐子路径  */
 function fullPathWithImmutable(obj, path) {

@@ -1,5 +1,5 @@
-import storage from 'packages/pures/storage';
-import formatTime from 'packages/pures/formatTime';
+import storage from 'modules/pures/storage';
+import formatTime from 'modules/pures/formatTime';
 import globalCache from './cache';
 
 /** 打印日志中间件, 默认只在dev环境下打印, 并且不在移动环境下打印 */
@@ -38,8 +38,8 @@ export function middlewareLog({
         // 用于打印title上的数据片段, 为了节约空间, 去除引号, 并且只打印 data
         const nextTitleString = JSON.stringify((nextState && nextState.data) || '').replace(/"/g, '');
 
-        // eslint-disable-next-line
         if (nextTitleString) {
+          // eslint-disable-next-line
           console.groupCollapsed(
             `%c|-- ${timeString}  [${key}]${statusString},  data: ${nextTitleString.substr(0, titleMaxLength)}${
               nextTitleString.length > titleMaxLength ? '...' : ''
@@ -47,6 +47,7 @@ export function middlewareLog({
             `background: rgb(70, 70, 70); color: rgb(240, 235, 200);margin:2px; padding: 3px; border-radius: 3px;`,
           );
         } else {
+          // eslint-disable-next-line
           console.groupCollapsed(
             `%c|-- ${timeString}  [${key}]${statusString}`,
             `background: rgb(70, 70, 70); color: rgb(240, 235, 200);margin:2px; padding: 3px; border-radius: 3px;`,

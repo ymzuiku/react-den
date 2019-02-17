@@ -1,4 +1,4 @@
-import got from 'packages/pures/got';
+import got from 'modules/pures/got';
 import { request } from 'graphql-request';
 import cache from './cache';
 

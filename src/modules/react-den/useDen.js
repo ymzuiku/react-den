@@ -157,12 +157,14 @@ export default function useDen({
       });
     }
   };
+
   React.useEffect(() => {
     if (cache.isDev && (!path || path.length === 0)) {
       throw new Error('[useAffinity] path is empty');
     }
     SUB_KEY++;
     const subKey = SUB_KEY;
+
     updateValue({ once, interval, data, variables, body, loading, error, optimistic }, subKey);
 
     if (interval > 0) {

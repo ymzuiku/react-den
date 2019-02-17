@@ -1,6 +1,6 @@
 import React from 'react';
-import { useDen, initStateToImmutable, initMiddleware, middlewareAutoLocalStorage } from 'packages/react-den';
-import useInput from 'packages/dom-hooks/useInput';
+import { useDen, initStateToImmutable, initMiddleware, middlewareAutoLocalStorage } from 'modules/react-den';
+import useInput from 'modules/dom-hooks/useInput';
 
 initStateToImmutable({
   user: {},
