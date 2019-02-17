@@ -211,7 +211,6 @@ function dllFilesAddRamdomId() {
 
 /** copy lib.copy array */
 function copyLibFiles() {
-  console.log(paths.copyList);
   for (const k in paths.copyList) {
     const p = paths.copyList[k];
     if (fs.existsSync(p)) {
