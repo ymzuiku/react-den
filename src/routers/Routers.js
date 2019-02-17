@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Redirect, Switch } from 'react-router-dom';
+import { Router, Redirect, Switch } from 'react-router-dom';
 import LazyRoute from 'modules/react-route-lazy';
 import history from 'src/tools/history';
 
