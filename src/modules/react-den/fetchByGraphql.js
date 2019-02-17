@@ -37,10 +37,6 @@ export default function({ gql, variables, path, dataGetter, oldState }) {
         .catch(error => {
           const errorMessage = got(() => error.response.errors[0].message);
 
-          if (cache.isDev) {
-            // eslint-disable-next-line
-            console.warn(errorMessage);
-          }
           cache.errorMiddlewares.forEach(fn => {
             if (typeof fn === 'function') {
               fn(error, cache, path, oldState);

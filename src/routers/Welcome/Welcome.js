@@ -29,7 +29,7 @@ const Sub = () => {
     path: ['user', 'getInvalid'],
     url: '/api/{parser}?name&age',
     variables: { parser: 'dog', name: 'getInterval', age: 125 },
-    interval: 500,
+    // interval: 500,
   });
   const [getError] = useDen({
     path: ['user', 'get-error'],
