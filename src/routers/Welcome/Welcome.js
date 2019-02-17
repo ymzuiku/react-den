@@ -2,7 +2,7 @@
 import React from 'react';
 import { initDevelopment, useDen } from 'react-den';
 
-initDevelopment(process.env.NODE_ENV === 'development');
+initDevelopment(true);
 
 const Sub = () => {
   const [gql] = useDen({

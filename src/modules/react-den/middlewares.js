@@ -29,7 +29,7 @@ export function middlewareLog({
       }
     });
   };
-  return (cache, path, lastState, nextState) => {
+  return (path, cache, lastState, nextState) => {
     if (cache.isDev) {
       const log = (format = true) => {
         const timeString = formatTime(void 0, [void 0, void 0, void 0, ':', ':', ' ', 'ms']);

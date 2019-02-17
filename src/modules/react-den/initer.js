@@ -8,6 +8,7 @@ export function initStateToImmutable(obj) {
     throw new Error('[initStateToImmutable] params need a Object');
   }
   cache.state = Map(obj);
+  return cache.state;
 }
 
 /** 添加中间件, 中间件是一个函数, 并且返回一个函数, 在每次更新状态的时候,会执行中间件的返回值, 并且传入上下文状态 */
@@ -17,6 +18,7 @@ export function initMiddleware(middlewares = [], isMerge) {
   } else {
     cache.middlewares = middlewares.filter(Boolean);
   }
+  return cache.middlewares;
 }
 
 /** 添加处理错误的中间件, 中间件是一个函数, 并且返回一个函数, 在每次更新状态的时候,会执行中间件的返回值, 并且传入上下文状态 */
@@ -26,12 +28,13 @@ export function initErrorMiddleware(middlewares, isMerge) {
   } else {
     cache.errorMiddlewares = middlewares;
   }
+  return cache.errorMiddlewares;
 }
 
 /** 初始化development状态, 打开打印及错误日志 */
-export function initDevelopment(isDev = false) {
+export function initDevelopment(isDev) {
   if (isDev) {
     cache.isDev = true;
-    initMiddleware([middlewareLog({})], true);
+    return initMiddleware([middlewareLog({})], true);
   }
 }

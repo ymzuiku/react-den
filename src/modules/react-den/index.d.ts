@@ -99,13 +99,13 @@ export default function useDen(params: IUseDenParams): [IValue, (params: IUpdate
 export function useDen(params: IUseDenParams): [IValue, (params: IUpdateDenParams) => void, clearIntervalTimer];
 
 /** 初始化 cache.state 为一个 immutable 对象 */
-export function initStateToImmutable(obj): void;
+export function initStateToImmutable(obj): Map;
 
 /** 添加中间件, 中间件是一个函数, 并且返回一个函数, 在每次更新状态的时候,会执行中间件的返回值, 并且传入上下文状态 */
-export function initMiddleware(middlewares: Array<IMiddleware>, onlyMerge: Boolean): void;
+export function initMiddleware(middlewares: Array<IMiddleware>, onlyMerge: Boolean): Array<IMiddleware>;
 
 /** 添加处理错误的中间件, 中间件是一个函数, 并且返回一个函数, 在每次获取错误状态的时候,会执行中间件的返回值, 并且传入上下文状态 */
-export function initErrorMiddleware(middlewares: Array<IMiddleware>, onlyMerge: Boolean): void;
+export function initErrorMiddleware(middlewares: Array<IMiddleware>, onlyMerge: Boolean): Array<IMiddleware>;
 
 interface IGraphqlConfig {
   url: String;
@@ -141,4 +141,4 @@ interface IRESTfulConfig {
 export function initRESTfulConfig(config: IRESTfulConfig): IRESTfulConfig;
 
 /** 初始化development状态, 打开打印及错误日志 */
-export function initDevelopment(): void;
+export function initDevelopment(): Array<IMiddleware>;
