@@ -188,8 +188,8 @@ function copyPublicFolder() {
     });
     dllFilesAddRamdomId();
   }
-  shouldBuildLib && copyLibFiles();
   shouldBuildLib && copyPackage();
+  shouldBuildLib && copyLibFiles();
 }
 
 /** If copy dll.js, add dll.jd randomId */
@@ -211,6 +211,7 @@ function dllFilesAddRamdomId() {
 
 /** copy lib.copy array */
 function copyLibFiles() {
+  console.log(paths.copyList);
   for (const k in paths.copyList) {
     const p = paths.copyList[k];
     if (fs.existsSync(p)) {

@@ -217,6 +217,7 @@ module.exports = function(webpackEnv) {
         ].filter(Boolean),
     output: {
       ...(isOnlyBuildJS && { library: '[name]' }),
+      ...(shouldBuildLib && { libraryTarget: 'commonjs2' }),
       // The build folder.
       path: shouldBuildDll ? dllDirPath : isEnvProduction ? paths.appBuild : undefined,
       // Add /* filename */ comments to generated require()s in the output.

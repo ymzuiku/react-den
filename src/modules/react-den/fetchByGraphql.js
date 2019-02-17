@@ -20,6 +20,7 @@ export function initGraphqlConfig({ url, errorFn }) {
     // eslint-disable-next-line
     throw "[initGraphqlConfig] errorFn typeof is't function";
   }
+  return config;
 }
 
 /** 请求数据并且缓存, 并且计算 loading, error, data */
@@ -39,7 +40,7 @@ export default function({ gql, variables, path, dataGetter, oldState }) {
 
           cache.errorMiddlewares.forEach(fn => {
             if (typeof fn === 'function') {
-              fn(error, cache, path, oldState);
+              fn(path, cache, error, oldState);
             }
           });
           // 设置错误状态, 还原乐观之前的数据

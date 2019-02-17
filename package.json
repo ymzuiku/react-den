@@ -28,6 +28,7 @@
     "graphql-request": "^1.8.2",
     "immutable": "^4.0.0-rc.12",
     "react": "^16.8.2",
+    "react-den": "^0.0.2",
     "react-dom": "^16.8.2",
     "react-pose": "^4.0.7",
     "react-router-dom": "^4.3.1"

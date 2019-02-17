@@ -1,6 +1,8 @@
 /* eslint-disable */
 import React from 'react';
-import { useDen } from 'modules/react-den';
+import { initDevelopment, useDen } from 'react-den';
+
+initDevelopment(process.env.NODE_ENV === 'development');
 
 const Sub = () => {
   const [gql] = useDen({
@@ -19,6 +21,7 @@ const Sub = () => {
     url: '/api/{parser}?name&age',
     variables: { parser: 'dog', name: 'dog', age: 125 },
   });
+
   const [getOnce, updateOne] = useDen({
     path: ['user', 'getOnce'],
     url: '/api/{parser}?name&age',

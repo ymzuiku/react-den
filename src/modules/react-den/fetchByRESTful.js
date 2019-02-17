@@ -7,8 +7,10 @@ let DEFAULT_CONFIG = {
   },
 };
 
+/** 初始化 RESTful请求的 options */
 export function initRESTfulConfig(config) {
   DEFAULT_CONFIG = { ...DEFAULT_CONFIG, ...config };
+  return DEFAULT_CONFIG;
 }
 
 /** 请求数据并且缓存, 并且计算 loading, error, data */
@@ -88,7 +90,7 @@ export default function({
         } else {
           cache.errorMiddlewares.forEach(fn => {
             if (typeof fn === 'function') {
-              fn(error, cache, path, oldState);
+              fn(path, cache, error, oldState);
             }
           });
           // 设置错误状态, 还原乐观之前的数据

@@ -41,9 +41,10 @@ export default function useDen({
   dataGetter,
   /** 乐观数据, 请求返回之前用于渲染的数据, 如果请求返回的数据和乐观数据不一致才会更新界面 */
   optimistic = null,
+  /** 请求返回之后使用解析函数的类型, 默认: 'json' */
   responseType = void 0,
+  /** 请求返回错误之后使用解析函数的类型, 默认: 'text' */
   responseErrorType = void 0,
-  getBody = void 0,
   /** 只执行一次 */
   once = false,
   /** 重复间隔 ms, 如果>0ms才会执行 */
@@ -61,7 +62,6 @@ export default function useDen({
       loading: nextLoading = loading,
       error: nextError = error,
       optimistic: nextOptimistic = null,
-      getBody: nextGetBody = getBody,
       once: nextOnce = once,
     },
     subKey,
@@ -148,7 +148,6 @@ export default function useDen({
         config,
         responseType,
         responseErrorType,
-        getBody: nextGetBody,
       }).then(() => {
         // 请求完之后更新所有注册过的页面
         for (const k in cache.setStateFunctions[key]) {

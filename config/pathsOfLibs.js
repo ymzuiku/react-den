@@ -74,9 +74,18 @@ const entryList = {};
 const copyList = {};
 for (let i = 0; i < libFile.copy.length; i++) {
   const str = libFile.copy[i];
-  if (str.search(/\//) > -1) {
+  if (Object.prototype.toString.call(str) === '[object Array]' && str.length > 1) {
+    copyList[str[1]] = path.resolve(rootPath, str[0]);
+  } else if (str.search(/\//) > -1) {
     const list = str.split('/');
-    copyList[list[0]] = path.resolve(rootPath, list[1]);
+    // 如果最终目录是目录
+    if (str.search(/\/$/ > -1)) {
+      copyList[list[list.length - 2]] = path.resolve(rootPath, str);
+    }
+    // 如果路径是目录, 最终是文件
+    else {
+      copyList[list[list.length - 1]] = path.resolve(rootPath, str);
+    }
   } else {
     copyList[str] = path.resolve(rootPath, str);
   }
@@ -129,7 +138,7 @@ function loadAllEnters(rootP) {
         if (v.search(/\.nolib/) > -1) {
           // 如果文件名包含 nolib 不抽出
         } else if (isReal && !libConfig.dontLib[vp]) {
-          if (v.search(/\.js/) > -1) {
+          if (v.search(/\.js/) > -1 && v.search(/\.json/ < 0)) {
             const vlist = v.split('.');
             entryList[vlist[0]] = vp;
           } else if (v.search(/\.d\.ts/) > -1) {
@@ -146,7 +155,7 @@ function loadAllEnters(rootP) {
         }
         // 如果以上条件不满足，但是文件名中包含 .lib 进行抽离
         else {
-          if (v.search(/\.lib\.js/) > -1) {
+          if (v.search(/\.lib\.js/) > -1 && v.search(/\.json/ < 0)) {
             const vlist = v.split('.');
             entryList[vlist[0]] = vp;
           } else if (v.search(/\.lib\.d\.ts/) > -1) {

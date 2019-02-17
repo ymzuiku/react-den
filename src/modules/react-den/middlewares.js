@@ -2,6 +2,11 @@ import storage from 'modules/pures/storage';
 import formatTime from 'modules/pures/formatTime';
 import globalCache from './cache';
 
+export const middlewareListener = {
+  isUseMiddlewareLog: false,
+  isUseMiddlewareAutoLocalStorage: false,
+};
+
 /** 打印日志中间件, 默认只在dev环境下打印, 并且不在移动环境下打印 */
 export function middlewareLog({
   isHidden = false,
@@ -10,6 +15,12 @@ export function middlewareLog({
   formatStringMaxLength = 500,
   titleMaxLength = 60,
 }) {
+  // 防止此中间键被重复注册
+  if (middlewareListener.isUseMiddlewareLog) {
+    return void 0;
+  }
+  middlewareListener.isUseMiddlewareLog = true;
+
   window.denLogList = [];
   window.denLog = function(len = window.denLogList.length, format) {
     window.denLogList.forEach((fn, i) => {
@@ -95,9 +106,16 @@ export function middlewareLog({
 
 /** 用于自动存储的中间件, 传入一个多维数组, 数组每个值都是immutable对象的 getIn 路径 */
 export function middlewareAutoLocalStorage(keys = []) {
+  // 防止此中间键被重复注册
+  if (middlewareListener.isUseMiddlewareAutoLocalStorage) {
+    return void 0;
+  }
+  middlewareListener.isUseMiddlewareAutoLocalStorage = true;
+
   function pathToKey(path) {
     return `|-- ${path.join(', ')}`;
   }
+
   const pathKeys = keys.map(v => {
     if (typeof v === 'string') {
       return [v];

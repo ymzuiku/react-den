@@ -1,8 +1,7 @@
 import { applyMiddleware, compose, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import * as effects from 'redux-saga/effects';
-
-const isDev = process.env.NODE_ENV === 'development';
+import isDev from 'modules/pures/isDev';
 
 function reducerInAction(state, action) {
   if (typeof action === 'function') {
@@ -38,7 +37,7 @@ function runSagaMiddleware(sagaMiddleware, sagaActions) {
  * @param  {object} sagaMaps=reducerInAction
  * @param  {Function} reducers=reducerInAction
  */
-export default function createStoreWithSaga(sagaActions, isUseReduxTools = isDev) {
+export default function createStoreWithSaga(sagaActions, isUseReduxTools = isDev()) {
   let reduxTools;
 
   if (isUseReduxTools && typeof window !== 'undefined') {

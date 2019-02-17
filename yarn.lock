@@ -8819,6 +8819,14 @@ react-app-polyfill@^0.2.0:
     raf "3.4.0"
     whatwg-fetch "3.0.0"
 
+react-den@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/react-den/-/react-den-0.0.2.tgz#2a7cae8fd53b1c5f256b617f7db1c974d16ea092"
+  integrity sha512-u8aqBOlHsDe5YTsrtl/yD2sIRyNkSm+OzyEXBIpB71gFUiSKfsnQQmk5K2yxRcbno/PhVKnBU1VEIVdMwNZZbQ==
+  dependencies:
+    graphql-request "^1.8.2"
+    immutable "^4.0.0-rc.12"
+
 react-dev-utils@^7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-7.0.1.tgz#c53e759a22668ee2c0d146c24ce4bdec2b41e3c8"
