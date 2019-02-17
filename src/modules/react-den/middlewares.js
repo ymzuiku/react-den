@@ -1,5 +1,5 @@
-import storage from 'modules/pures/storage';
-import formatTime from 'modules/pures/formatTime';
+import storage from 'packages/pures/storage';
+import formatTime from 'packages/pures/formatTime';
 import globalCache from './cache';
 
 /** 打印日志中间件, 默认只在dev环境下打印, 并且不在移动环境下打印 */
