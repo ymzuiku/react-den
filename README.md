@@ -1,54 +1,84 @@
-## Install
+## Example
 
-copy this code to Terminal, and change `<your-project>` string
+```js
+/* eslint-disable */
+import React from 'react';
+import { initDevelopment, useDen } from 'react-den';
 
-```sh
-react-project-gui(){
-  git clone -o react-project-gui -b $1 --single-branch git@github.com:ymzuiku/react-project-gui.git $2 &&
-  cd $2 && yarn && yarn dll && yarn start
-}
-react-project-gui master your-project
-```
+initDevelopment(true);
 
-Wait done, then open http://127.0.0.1:3100
+const Sub = () => {
+  const [gql] = useDen({
+    path: ['user', 'gql'],
+    gql: `mutation AddBook($title: String){
+      addBook(title: $title, author: "tester") {
+        id
+        title
+        author
+      }
+    }`,
+    variables: { title: 'dog' },
+  });
+  const [getUser, updateGetUser] = useDen({
+    path: ['user', 'get'],
+    url: '/api/{parser}?name&age',
+    variables: { parser: 'dog', name: 'dog', age: 125 },
+  });
 
-## Use
+  const [getOnce, updateOne] = useDen({
+    path: ['user', 'getOnce'],
+    url: '/api/{parser}?name&age',
+    variables: { parser: 'dog', name: 'once', age: 125 },
+    once: true,
+  });
+  const [getInterval, setInterval, clearInterval] = useDen({
+    path: ['user', 'getInvalid'],
+    url: '/api/{parser}?name&age',
+    variables: { parser: 'dog', name: 'getInterval', age: 125 },
+    // interval: 500,
+  });
+  const [getError] = useDen({
+    path: ['user', 'get-error'],
+    url: '/api/error',
+    variables: { title: 'dog' },
+  });
+  const [postUser] = useDen({
+    path: ['user', 'get'],
+    url: '/api/dog',
+    method: 'POST',
+    body: { title: 'dog' },
+  });
+  const [postError] = useDen({
+    path: ['user', 'get-error'],
+    url: '/api/error',
+    method: 'POST',
+    body: { title: 'dog' },
+  });
 
-Run dev project
+  return (
+    <div>
+      <header>head</header>
+      <div>banner</div>
+      <div>test:</div>
+      <div>gql: {JSON.stringify(gql)}</div>
+      <div onClick={() => updateGetUser({})}>getUser: {JSON.stringify(getUser)}</div>
+      <div onClick={() => updateOne({ once: false })}>getOnce: {JSON.stringify(getOnce)}</div>
+      <div onClick={() => clearInterval({ variables: 0 })}>getInterval: {JSON.stringify(getInterval)}</div>
+      <div>getError: {JSON.stringify(getError)}</div>
+      <div>postUser: {JSON.stringify(postUser)}</div>
+      <div>postError: {JSON.stringify(postError)}</div>
+    </div>
+  );
+};
 
-```sh
-$ yarn dll # need run once
-$ yarn start
-```
+export default () => {
+  return (
+    <>
+      <Sub />
+      <Sub />
+      <Sub />
+    </>
+  );
+};
 
-Build Product projcet
-
-```
-$ yarn build
-```
-
-## License
-
-```
-MIT License
-
-Copyright (c) 2013-present, Facebook, Inc.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 ```
