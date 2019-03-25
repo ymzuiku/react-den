@@ -1,9 +1,8 @@
 {
   "name": "react-den",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "react-den",
   "dependencies": {
-    "react": "^16.8.4",
     "graphql-request": "^1.8.2",
     "immutable": "^4.0.0-rc.12",
     "pure-fn": "^0.0.2"
