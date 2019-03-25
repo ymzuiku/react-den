@@ -1,4 +1,4 @@
-import parserURL from 'packages/pures/parserURL';
+import parserURL from 'pure-fn/lib/parserURL';
 import cache from './cache';
 
 let DEFAULT_CONFIG = {

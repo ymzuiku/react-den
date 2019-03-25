@@ -1,5 +1,5 @@
-import storage from 'packages/pures/storage';
-import formatTime from 'packages/pures/formatTime';
+import storage from 'pure-fn/lib/storage';
+import formatTime from 'pure-fn/lib/formatTime';
 import globalCache from './cache';
 
 export const middlewareListener = {

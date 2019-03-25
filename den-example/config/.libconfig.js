@@ -1,8 +1,8 @@
 module.exports = {
-  lib: ['src/packages/react-den-form'], // need babel files or dirs
+  lib: ['src/packages/react-den'], // need babel files or dirs
   dontLib: [], // dont babel files or dirs
   copy: {
-    'src/packages/react-den-form': '../src',
+    'src/packages/react-den': '../src',
     'dist': '../lib',
     'dist/package.json': '../package.json',
   },
@@ -12,7 +12,10 @@ module.exports = {
     "types": "src/index.d.ts",
     "dependencies": {
       "react": "^16.8.4"
+      "graphql-request": "^1.8.2",
+      "immutable": "^4.0.0-rc.12",
+      "pure-fn": "^0.0.2",
     },
   },
-  gitURL: 'github.com/ymzuiku/react-den-form',
+  gitURL: 'github.com/ymzuiku/react-den',
 };

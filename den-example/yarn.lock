@@ -4586,8 +4586,8 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
 
 graphql-request@^1.8.2:
   version "1.8.2"
-  resolved "http://47.107.150.36:4873/graphql-request/-/graphql-request-1.8.2.tgz#398d10ae15c585676741bde3fc01d5ca948f8fbe"
-  integrity sha1-OY0QrhXFhWdnQb3j/AHVypSPj74=
+  resolved "https://registry.yarnpkg.com/graphql-request/-/graphql-request-1.8.2.tgz#398d10ae15c585676741bde3fc01d5ca948f8fbe"
+  integrity sha512-dDX2M+VMsxXFCmUX0Vo0TopIZIX4ggzOtiCsThgtrKR4niiaagsGTDIHj3fsOMFETpa064vzovI+4YV4QnMbcg==
   dependencies:
     cross-fetch "2.2.2"
 
@@ -5050,7 +5050,7 @@ immer@1.7.2:
 
 immutable@^4.0.0-rc.12:
   version "4.0.0-rc.12"
-  resolved "http://47.107.150.36:4873/immutable/-/immutable-4.0.0-rc.12.tgz#ca59a7e4c19ae8d9bf74a97bdf0f6e2f2a5d0217"
+  resolved "https://registry.yarnpkg.com/immutable/-/immutable-4.0.0-rc.12.tgz#ca59a7e4c19ae8d9bf74a97bdf0f6e2f2a5d0217"
   integrity sha512-0M2XxkZLx/mi3t8NVwIm1g8nHoEmM9p9UBl/G9k4+hm0kBgOVdMV/B3CY5dQ8qG8qc80NN4gDV4HQv6FTJ5q7A==
 
 import-cwd@^2.0.0:
@@ -8601,6 +8601,11 @@ punycode@^1.2.4, punycode@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
   integrity sha1-wNWmOycYgArY4esPpSachN1BhF4=
+
+pure-fn@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/pure-fn/-/pure-fn-0.0.2.tgz#9fd1cfb9c5835698e7342260d4c36962a46c44d1"
+  integrity sha512-MOKqPQKZ3NVymrEey2iv7PwSmh5OFICFnk582RaHuYwnmSSiQzGMF0lsr4io7Sv4m5YUtp0YcaauQwl2057zkw==
 
 q@^1.1.2:
   version "1.5.1"
