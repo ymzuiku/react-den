@@ -11,7 +11,6 @@ module.exports = {
     "main": "lib/index.js",
     "types": "src/index.d.ts",
     "dependencies": {
-      "react": "^16.8.4"
       "graphql-request": "^1.8.2",
       "immutable": "^4.0.0-rc.12",
       "pure-fn": "^0.0.2",
