@@ -1,9 +1,0 @@
-{
-  "name": "react-route-lazy",
-  "version": "0.0.1",
-  "author": "pillar",
-  "dependencies": {
-    "react": "^16.8.1",
-    "react-router-dom": "^0.0.1"
-  }
-}
