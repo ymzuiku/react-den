@@ -1,7 +1,7 @@
 {
-  "name": "react-start-project",
+  "name": "react-den",
   "version": "0.0.1",
-  "description": "React Start Project",
+  "description": "react-den",
   "private": true,
   "scripts": {
     "reload-img": "auto-require-files src/assets index",
@@ -14,13 +14,6 @@
     "lib": "cross-env BUILD_LIB=true node scripts/build.js",
     "lint-ci": "lint-staged",
     "test": "node scripts/test.js"
-  },
-  "dll_react": {
-    "react": true,
-    "react-dom": true
-  },
-  "dll_react_other": {
-    "react-router-dom": true
   },
   "dependencies": {
     "graphql-request": "^1.8.2",
