@@ -29,6 +29,22 @@ function HomeLocal() {
   const [localBooks, updateLocalBooks] = useDen({
     path: ['user', 'localBooks'],
   });
+
+  // eslint-disable-next-line
+  const [gqlBooks, updateGqlBooks] = useDen({
+    path: ['fetch-user', 'books'],
+    dataGetter: data => {
+      if (data && data.addBook) {
+        return data.addBook;
+      }
+      return data;
+    },
+    gql: `mutation fn($title: String){ addBook(title: $title){id \n title}}`,
+  });
+
+  // eslint-disable-next-line
+  console.log('re-render');
+
   const [inputLocalValue, setInputLocalValue] = useInput();
 
   return (
