@@ -33,9 +33,9 @@ export default function useDen({
   loading,
   /** 初始化错误, 默认为 void 0 */
   error,
-  /** axios中的config */
+  /** fetch 中的config */
   config,
-  /** axios中的method, 默认为 GET */
+  /** fetch 中的method, 默认为 GET */
   method = 'GET',
   /** 数据写入本地 immutable 之前进行的处理 */
   dataGetter,

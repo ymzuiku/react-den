@@ -58,9 +58,9 @@ interface IUseDenParams {
   loading: Boolean;
   /** 初始化错误, 默认为 void 0 */
   error: String;
-  /** axios中的config */
+  /** fetch 中的config */
   config: Object;
-  /** axios中的method, 默认为 GET */
+  /** fetch 中的method, 默认为 GET */
   method: 'GET' | 'PUT' | 'POST' | 'DELETE' | any;
   /** 数据写入本地 immutable 之前进行的处理 */
   dataGetter: Function;
