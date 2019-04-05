@@ -13,8 +13,8 @@ function fullPathWithImmutable(obj, path) {
 }
 
 const cache = {
-  /** appKey用于本地存储的键 */
-  appKey: 'react-den-default-appKey',
+  // /** appKey用于本地存储的键 */
+  // appKey: 'react-den-default-appKey',
   /** 默认 false, 只有处于dev环境才会输出日志和错误提示 */
   isDev: false,
   /** 整个项目的状态树, 请一直保持为一个 immutable 的 Map */

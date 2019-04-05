@@ -6,7 +6,7 @@ initStateToImmutable({
   user: {},
 });
 
-initMiddleware([middlewareAutoLocalStorage(['user'])], true);
+initMiddleware([middlewareAutoLocalStorage('react-den-example', ['user'])], true);
 
 function RenderBooks({ style, loading, error, data }) {
   if (loading) {
@@ -25,7 +25,61 @@ function RenderBooks({ style, loading, error, data }) {
   return null;
 }
 
-function HomeHello() {
+function HomeLocal() {
+  const [localBooks, updateLocalBooks] = useDen({
+    path: ['user', 'localBooks'],
+  });
+  const [inputLocalValue, setInputLocalValue] = useInput();
+
+  return (
+    <>
+      <RenderBooks name="local" {...localBooks} />
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          updateLocalBooks({ nextData: [...(localBooks.data || []), { id: inputLocalValue, title: inputLocalValue }] });
+          setInputLocalValue('');
+        }}
+      >
+        <input value={inputLocalValue} onChange={setInputLocalValue} />
+      </form>
+    </>
+  );
+}
+
+function HomeFetch() {
+  const [gqlBooks, updateGqlBooks] = useDen({
+    path: ['fetch-user', 'books'],
+    dataGetter: data => {
+      if (data && data.addBook) {
+        return data.addBook;
+      }
+      return data;
+    },
+    gql: `mutation fn($title: String){ addBook(title: $title){id \n title}}`,
+  });
+  const [inputValue, setInputValue] = useInput();
+
+  return (
+    <>
+      <RenderBooks name="gql" style={{ color: '#f00' }} {...gqlBooks} />
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          updateGqlBooks({
+            nextData: { title: inputValue },
+            optimistic: [...(gqlBooks.data || []), { id: inputValue, title: inputValue }],
+          });
+          setInputValue('');
+        }}
+      >
+        <input value={inputValue} onChange={setInputValue} />
+      </form>
+    </>
+  );
+}
+
+function HomeGqlQuery() {
   const [hello] = useDen({
     path: ['user', 'hello'],
     gql: `query {hello}`,
@@ -45,29 +99,7 @@ function HomeHello() {
   );
 }
 
-function HomeLocal() {
-  const [localBooks, updateLocalBooks] = useDen({
-    path: ['user', 'localBooks'],
-  });
-  const [inputLocalValue, setInputLocalValue] = useInput();
-
-  return (
-    <>
-      <RenderBooks name="local" {...localBooks} />
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          updateLocalBooks({ data: [...(localBooks.data || []), { id: inputLocalValue, title: inputLocalValue }] });
-          setInputLocalValue('');
-        }}
-      >
-        <input value={inputLocalValue} onChange={setInputLocalValue} />
-      </form>
-    </>
-  );
-}
-
-function HomeGql() {
+function HomeGqlMutation() {
   const [gqlBooks, updateGqlBooks] = useDen({
     path: ['gql-user', 'books'],
     dataGetter: data => {
@@ -87,7 +119,7 @@ function HomeGql() {
         onSubmit={e => {
           e.preventDefault();
           updateGqlBooks({
-            data: { title: inputValue },
+            nextData: { title: inputValue },
             optimistic: [...(gqlBooks.data || []), { id: inputValue, title: inputValue }],
           });
           setInputValue('');
@@ -102,9 +134,10 @@ function HomeGql() {
 function Home() {
   return (
     <>
-      <HomeHello />
       <HomeLocal />
-      <HomeGql />
+      <HomeFetch />
+      <HomeGqlQuery />
+      <HomeGqlMutation />
     </>
   );
 }

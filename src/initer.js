@@ -38,3 +38,7 @@ export function initDevelopment(isDev) {
     return initMiddleware([middlewareLog({})], true);
   }
 }
+
+export function initAppkey(appkey) {
+  cache.appKey = appkey;
+}

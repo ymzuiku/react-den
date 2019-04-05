@@ -105,7 +105,7 @@ export function middlewareLog({
 }
 
 /** 用于自动存储的中间件, 传入一个多维数组, 数组每个值都是immutable对象的 getIn 路径 */
-export function middlewareAutoLocalStorage(keys = []) {
+export function middlewareAutoLocalStorage(appKey = 'react-den-key-need-replace', keys = []) {
   // 防止此中间键被重复注册
   if (middlewareListener.isUseMiddlewareAutoLocalStorage) {
     return void 0;
@@ -123,9 +123,8 @@ export function middlewareAutoLocalStorage(keys = []) {
     return v;
   });
 
-  if (globalCache && globalCache.appKey) {
-    storage.localName = globalCache.appKey;
-  }
+  storage.localName = appKey;
+
   const localState = storage.load() || {};
 
   // 将历史的数据保存到 cache.state 中
@@ -138,6 +137,7 @@ export function middlewareAutoLocalStorage(keys = []) {
       }
     });
   }
+
   globalCache.setIn(['__supine__'], { data: { init: true, localStateLoaded: true } });
   return () => {
     pathKeys.forEach(watchPath => {

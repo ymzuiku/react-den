@@ -17,8 +17,8 @@ interface IMiddlewareParams {
 const IMiddleware = (params: IMiddlewareParams) => any;
 
 interface ICache {
-  /** appKey用于本地存储的键 */
-  appKey: String;
+  // /** appKey用于本地存储的键 */
+  // appKey: String;
   /** 默认 false, 只有处于dev环境才会输出日志和错误提示 */
   isDev: Boolean;
   /** 整个项目的状态树, 请一直保持为一个 immutable 的 Map */
@@ -40,15 +40,15 @@ interface ICache {
 export const cache: ICache;
 
 interface IUseDenParams {
-  /** memory|graphql|RESTful 强制设定类型, 不根据 gql 或则 url 进行判断 */
-  kind: 'memory' | 'graphql' | 'RESTful';
+  /** local|graphql|RESTful 强制设定类型, 不根据 gql 或则 url 进行判断 */
+  kind: 'local' | 'graphql' | 'RESTful';
   /** 不可变数据读写路径 */
   path: Array<String>;
   /** graphql 的 query 或 mutation */
   gql: String;
   /** RESTful 的 url */
   url: String;
-  /** memory: 请求body中的data */
+  /** local: 请求body中的data */
   data: Object;
   /** RESTful: 请求body中的body */
   body: Object;
@@ -74,23 +74,25 @@ interface IUseDenParams {
   once: Boolean;
   /** 重复间隔 ms, 如果>0ms才会执行 */
   interval: Number;
+  /** 初始化即请求 */
+  fetchAtInit: Boolean;
 }
 
 interface IUpdateDenParams {
-  /** memory: 请求body中的data */
-  data: Object;
+  /** local: 请求body中的data */
+  nextData: Object;
   /** RESTful: 请求body中的body */
-  body: Object;
+  nextBody: Object;
   /** graphql: variables对象 或 RESTful GET URL地址参数 */
-  variables: Object;
+  nextVariables: Object;
   /** 初始化loading, 默认为true */
-  loading: Boolean;
+  nextLoading: Boolean;
   /** 初始化错误, 默认为 void 0 */
-  error: String;
+  nextError: String;
+  /** 只执行一次 */
+  nextOnce: Boolean;
   /** 乐观数据, 请求返回之前用于渲染的数据, 如果请求返回的数据和乐观数据不一致才会更新界面 */
   optimistic: Object;
-  /** 只执行一次 */
-  once: Boolean;
 }
 
 /** 返回 数据, 更新数据函数, 清除 Interval 事件函数 */
@@ -124,7 +126,7 @@ interface IMiddlewareLogParams {
 export function middlewareLog(params: IMiddlewareLogParams): void;
 
 /** 用于自动存储的中间件, 传入一个多维数组, 数组每个值都是immutable对象的 getIn 路径 */
-export function middlewareAutoLocalStorage(keys: Array<String | Array<String>>): void;
+export function middlewareAutoLocalStorage(appKey: String, keys: Array<String | Array<String>>): void;
 
 /** 初始化 graphql URL */
 export function initGraphqlConfig(config: IGraphqlConfig): IGraphqlConfig;
@@ -142,3 +144,4 @@ export function initRESTfulConfig(config: IRESTfulConfig): IRESTfulConfig;
 
 /** 初始化development状态, 打开打印及错误日志 */
 export function initDevelopment(): Array<IMiddleware>;
+

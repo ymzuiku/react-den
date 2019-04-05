@@ -15,7 +15,7 @@ export function fixDataGetter(dataGetter, data) {
 
 /** 同质化服务端数据和本地数据的读写 */
 export default function useDen({
-  /** memory|graphql|RESTful 强制设定类型, 不根据 gql 或则 url 进行判断 */
+  /** local|graphql|RESTful 强制设定类型, 不根据 gql 或则 url 进行判断 */
   kind,
   /** 不可变数据读写路径 */
   path,
@@ -23,7 +23,7 @@ export default function useDen({
   gql,
   /** RESTful 的 url */
   url,
-  /** memory: 请求body中的data */
+  /** local: 请求body中的data */
   data = null,
   /** RESTful: 请求body中的body */
   body = null,
@@ -47,22 +47,24 @@ export default function useDen({
   responseErrorType = void 0,
   /** 只执行一次 */
   once = false,
+  /** 注册即请求 */
+  fetchAtInit = false,
   /** 重复间隔 ms, 如果>0ms才会执行 */
   interval = 0,
 }) {
   const [value, setValue] = React.useState({ loading: false, error: void 0, data: void 0 });
   const [clearTimer, setClearTimer] = React.useState(void 0);
-  let timer = void 0;
+  const timer = React.useRef({ current: void 0 });
 
   const updateValue = (
     {
-      data: nextData = data,
-      body: nextBody = body,
-      variables: nextVariables = variables,
-      loading: nextLoading = loading,
-      error: nextError = error,
+      nextData = data,
+      nextBody = body,
+      nextVariables = variables,
+      nextLoading = loading,
+      nextError = error,
+      nextOnce = once,
       optimistic: nextOptimistic = null,
-      once: nextOnce = once,
     },
     subKey,
   ) => {
@@ -88,7 +90,7 @@ export default function useDen({
       } else if (url) {
         kind = 'RESTful';
       } else {
-        kind = 'memory';
+        kind = 'local';
       }
     }
 
@@ -110,7 +112,7 @@ export default function useDen({
     // 非本地类型, 请求之前设定loading状态
     if (nextOptimistic !== null) {
       cache.setIn(path, { data: fixDataGetter(dataGetter, nextOptimistic), loading: nextLoading, error: nextError });
-    } else if (kind !== 'memory') {
+    } else if (kind !== 'local') {
       cache.setIn(path, { loading: true });
     }
 
@@ -125,7 +127,7 @@ export default function useDen({
     }
 
     // 通过请求更新本地状态
-    if (kind !== 'memory') {
+    if (kind !== 'local') {
       let fetchFunction;
 
       // 根据kind使用graphql或者restful进行请求
@@ -164,16 +166,18 @@ export default function useDen({
     SUB_KEY++;
     const subKey = SUB_KEY;
 
-    updateValue({ once, interval, data, variables, body, loading, error, optimistic }, subKey);
+    if (fetchAtInit) {
+      updateValue({ once, interval, data, variables, body, loading, error, optimistic }, subKey);
+    }
 
     if (interval > 0) {
-      timer = setInterval(() => {
+      timer.current = setInterval(() => {
         updateValue({ once, interval, data, variables, body, loading, error, optimistic }, subKey);
       }, interval);
 
       setClearTimer(() => () => {
-        clearInterval(timer);
-        timer = void 0;
+        clearInterval(timer.current);
+        timer.current = void 0;
       });
     } else {
       updateValue({ once, interval, data, variables, body, loading, error, optimistic }, subKey);
