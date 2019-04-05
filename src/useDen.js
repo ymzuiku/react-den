@@ -140,10 +140,8 @@ export default function useDen({
       }
 
       // 同步注册的页面进行更新
-      if (nextIsSetState) {
-        for (const k in cache.setStateFunctions[key]) {
-          cache.setStateFunctions[key][k]();
-        }
+      for (const k in cache.setStateFunctions[key]) {
+        cache.setStateFunctions[key][k]();
       }
 
       // 根据kind使用graphql或者restful进行请求
@@ -156,10 +154,8 @@ export default function useDen({
           oldState,
         }).then(() => {
           // 请求完之后更新所有注册过的页面
-          if (nextIsSetState) {
-            for (const k in cache.setStateFunctions[key]) {
-              cache.setStateFunctions[key][k]();
-            }
+          for (const k in cache.setStateFunctions[key]) {
+            cache.setStateFunctions[key][k]();
           }
         });
       } else if (kind === 'REST') {
@@ -176,10 +172,8 @@ export default function useDen({
           responseErrorType,
         }).then(() => {
           // 请求完之后更新所有注册过的页面
-          if (nextIsSetState) {
-            for (const k in cache.setStateFunctions[key]) {
-              cache.setStateFunctions[key][k]();
-            }
+          for (const k in cache.setStateFunctions[key]) {
+            cache.setStateFunctions[key][k]();
           }
         });
       }
