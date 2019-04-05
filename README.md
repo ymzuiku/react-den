@@ -136,7 +136,7 @@ function HomeGqlMutation() {
 
 function Home() {
   return (
-    <
+    <>
       <HomeLocal />
       <HomeFetch />
       <HomeGqlQuery />
@@ -146,6 +146,6 @@ function Home() {
 }
 
 export default Home;
-;
+
 
 ```
