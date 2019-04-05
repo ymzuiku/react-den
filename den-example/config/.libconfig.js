@@ -2,6 +2,7 @@ module.exports = {
   lib: ['src/packages/react-den'], // need babel files or dirs
   dontLib: [], // dont babel files or dirs
   copy: {
+    'README.md': '../README.md',
     'src/packages/react-den': '../src',
     dist: '../lib',
     'dist/package.json': '../package.json',

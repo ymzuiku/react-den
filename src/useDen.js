@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import fetchByGraphql from './fetchByGraphql';
 import fetchByRESTful from './fetchByRESTful';
 import cache from './cache';
@@ -57,119 +57,126 @@ export default function useDen({
   const timer = useRef(void 0);
   const isNeedUpdate = useRef(fetchAtInit);
 
-  const updateValue = (
-    {
-      nextData = data,
-      nextBody = body,
-      nextVariables = variables,
-      nextLoading = loading,
-      nextError = error,
-      nextOnce = once,
-      nextOptimistic = optimistic,
-    },
-    subKey,
-  ) => {
-    const key = JSON.stringify(path);
+  const updateValue = useCallback(
+    (
+      {
+        nextData = data,
+        nextBody = body,
+        nextVariables = variables,
+        nextLoading = loading,
+        nextError = error,
+        nextOnce = once,
+        nextOptimistic = optimistic,
+      },
+      subKey,
+    ) => {
+      console.log('in-to');
+      const key = JSON.stringify(path);
 
-    // 若有once, 并且设定了节流器, 则进行拦截
-    if (nextOnce && cache.throttles[key]) {
-      return;
-    }
-    // 若无once, 并且设定了节流器, 则清理节流器
-    if (!nextOnce && cache.throttles[key]) {
-      delete cache.throttles[key];
-    }
-    // 如果以上条件不满足, 并且没有设定过节流器, 则设定节流器
-    else if (!cache.throttles[key]) {
-      cache.throttles[key] = true;
-    }
-
-    // 根据传入类型来判断 kind
-    if (!kind) {
-      if (gql) {
-        kind = 'graphql';
-      } else if (url) {
-        kind = 'REST';
-      } else {
-        kind = 'local';
+      // 若有once, 并且设定了节流器, 则进行拦截
+      if (nextOnce && cache.throttles[key]) {
+        return;
       }
-    }
+      // 若无once, 并且设定了节流器, 则清理节流器
+      if (!nextOnce && cache.throttles[key]) {
+        delete cache.throttles[key];
+      }
+      // 如果以上条件不满足, 并且没有设定过节流器, 则设定节流器
+      else if (!cache.throttles[key]) {
+        cache.throttles[key] = true;
+      }
 
-    // 初始化当前 path 的 use
-    if (!cache.setStateFunctions[key]) {
-      cache.setStateFunctions[key] = {};
-    }
-
-    // 初始化当前use的setState
-    if (subKey && !cache.setStateFunctions[key][subKey]) {
-      cache.setStateFunctions[key][subKey] = () => {
-        setValue(cache.getIn(path));
-      };
-    }
-
-    // 保存乐观之前的数据, 用于乐观失败还原
-    const oldState = cache.getIn(path) || {};
-
-    if (isNeedUpdate.current === false) {
-      isNeedUpdate.current = true;
-      return;
-    }
-
-    // 非本地类型, 请求之前设定loading状态
-    if (nextOptimistic !== null) {
-      cache.setIn(path, {
-        data: fixDataGetter(dataGetter, nextOptimistic),
-        loading: nextLoading || false,
-        error: nextError,
-      });
-    } else if (kind !== 'local') {
-      cache.setIn(path, { loading: true });
-    }
-
-    // 更新本地状态
-    else {
-      cache.setIn(path, { data: fixDataGetter(dataGetter, nextData), loading: nextLoading || false, error: nextError });
-    }
-
-    // 同步注册的页面进行更新
-    for (const k in cache.setStateFunctions[key]) {
-      cache.setStateFunctions[key][k]();
-    }
-
-    // 根据kind使用graphql或者restful进行请求
-    if (kind === 'graphql') {
-      fetchByGraphql({
-        gql,
-        variables: nextVariables,
-        path,
-        dataGetter,
-        oldState,
-      }).then(() => {
-        // 请求完之后更新所有注册过的页面
-        for (const k in cache.setStateFunctions[key]) {
-          cache.setStateFunctions[key][k]();
+      // 根据传入类型来判断 kind
+      if (!kind) {
+        if (gql) {
+          kind = 'graphql';
+        } else if (url) {
+          kind = 'REST';
+        } else {
+          kind = 'local';
         }
-      });
-    } else if (kind === 'REST') {
-      fetchByRESTful({
-        url,
-        method,
-        body: nextBody,
-        variables: nextVariables,
-        config,
-        path,
-        dataGetter,
-        oldState,
-        responseType,
-        responseErrorType,
-      }).then(() => {
-        // 请求完之后更新所有注册过的页面
-        for (const k in cache.setStateFunctions[key]) {
-          cache.setStateFunctions[key][k]();
-        }
-      });
-    }
-  };
+      }
+
+      // 初始化当前 path 的 use
+      if (!cache.setStateFunctions[key]) {
+        cache.setStateFunctions[key] = {};
+      }
+
+      // 初始化当前use的setState
+      if (subKey && !cache.setStateFunctions[key][subKey]) {
+        cache.setStateFunctions[key][subKey] = () => {
+          setValue(cache.getIn(path));
+        };
+      }
+
+      // 保存乐观之前的数据, 用于乐观失败还原
+      const oldState = cache.getIn(path) || {};
+
+      if (isNeedUpdate.current === false) {
+        isNeedUpdate.current = true;
+        return;
+      }
+
+      // 非本地类型, 请求之前设定loading状态
+      if (nextOptimistic !== null) {
+        cache.setIn(path, {
+          data: fixDataGetter(dataGetter, nextOptimistic),
+          loading: nextLoading || false,
+          error: nextError,
+        });
+      } else if (kind !== 'local') {
+        cache.setIn(path, { loading: true });
+      }
+
+      // 更新本地状态
+      else {
+        cache.setIn(path, {
+          data: fixDataGetter(dataGetter, nextData),
+          loading: nextLoading || false,
+          error: nextError,
+        });
+      }
+
+      // 同步注册的页面进行更新
+      for (const k in cache.setStateFunctions[key]) {
+        cache.setStateFunctions[key][k]();
+      }
+
+      // 根据kind使用graphql或者restful进行请求
+      if (kind === 'graphql') {
+        fetchByGraphql({
+          gql,
+          variables: nextVariables,
+          path,
+          dataGetter,
+          oldState,
+        }).then(() => {
+          // 请求完之后更新所有注册过的页面
+          for (const k in cache.setStateFunctions[key]) {
+            cache.setStateFunctions[key][k]();
+          }
+        });
+      } else if (kind === 'REST') {
+        fetchByRESTful({
+          url,
+          method,
+          body: nextBody,
+          variables: nextVariables,
+          config,
+          path,
+          dataGetter,
+          oldState,
+          responseType,
+          responseErrorType,
+        }).then(() => {
+          // 请求完之后更新所有注册过的页面
+          for (const k in cache.setStateFunctions[key]) {
+            cache.setStateFunctions[key][k]();
+          }
+        });
+      }
+    },
+  );
 
   useEffect(() => {
     if (cache.isDev && (!path || path.length === 0)) {
@@ -204,7 +211,7 @@ export default function useDen({
       }
       delete cache.setStateFunctions[key][subKey];
     };
-  }, [kind, url, gql, method, once, JSON.stringify(path), fetchAtInit, interval]);
+  }, [once, fetchAtInit, interval]);
 
   return [value, updateValue, clearTimer];
 }
