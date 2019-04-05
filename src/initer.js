@@ -1,6 +1,5 @@
 import { Map } from 'immutable';
 import cache from './cache';
-import { middlewareLog } from './middlewares';
 
 /** 初始化 cache.state 为一个 immutable 对象 */
 export function initStateToImmutable(obj) {
@@ -29,16 +28,4 @@ export function initErrorMiddleware(middlewares, isMerge) {
     cache.errorMiddlewares = middlewares;
   }
   return cache.errorMiddlewares;
-}
-
-/** 初始化development状态, 打开打印及错误日志 */
-export function initDevelopment(isDev) {
-  if (isDev) {
-    cache.isDev = true;
-    return initMiddleware([middlewareLog({})], true);
-  }
-}
-
-export function initAppkey(appkey) {
-  cache.appKey = appkey;
 }

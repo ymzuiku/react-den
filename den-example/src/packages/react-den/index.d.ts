@@ -21,6 +21,8 @@ interface ICache {
   // appKey: String;
   /** 默认 false, 只有处于dev环境才会输出日志和错误提示 */
   isDev: Boolean;
+  /** 设置 sessionStorage key, 并且将数据同步在 sessionStorage */
+  webDebugToolKey: String;
   /** 整个项目的状态树, 请一直保持为一个 immutable 的 Map */
   state: Map;
   /** 用于跨组件更新状态的函数, 函数针对于 state的路径进行分组 */
@@ -151,6 +153,4 @@ interface IRESTfulConfig {
 /** 初始化 REST 请求的 options */
 export function initRESTfulConfig(config: IRESTfulConfig): IRESTfulConfig;
 
-/** 初始化development状态, 打开打印及错误日志 */
-export function initDevelopment(isDev:Boolean): Array<IMiddleware>;
 

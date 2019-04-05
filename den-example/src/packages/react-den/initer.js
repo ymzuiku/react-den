@@ -29,8 +29,3 @@ export function initErrorMiddleware(middlewares, isMerge) {
   }
   return cache.errorMiddlewares;
 }
-
-/** 初始化development状态, 打开打印及错误日志 */
-export function initDevelopment(isDev) {
-  cache.isDev = isDev;
-}

@@ -1,17 +1,9 @@
 /* eslint-disable */
 import React from 'react';
-import {
-  useDen,
-  initDevelopment,
-  initStateToImmutable,
-  initMiddleware,
-  middlewareAutoLocalStorage,
-} from 'packages/react-den';
+import { useDen, initMiddleware, cache } from 'packages/react-den';
 
-initDevelopment(true);
-initStateToImmutable({
-  user: {},
-});
+cache.isDev = true;
+cache.webDebugToolKey = 'den-example-debug';
 
 // initMiddleware([middlewareAutoLocalStorage('react-den-example', ['user'])], true);
 

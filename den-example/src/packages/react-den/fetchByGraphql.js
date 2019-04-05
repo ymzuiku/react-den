@@ -9,7 +9,7 @@ function got(fn) {
   }
 }
 
-const config = {
+export const config = {
   url: '/graphql',
 };
 

@@ -1,7 +1,7 @@
 import parserURL from 'pure-fn/lib/parserURL';
 import cache from './cache';
 
-let DEFAULT_CONFIG = {
+export const DEFAULT_CONFIG = {
   headers: {
     'Content-Type': 'application/json',
   },
@@ -9,7 +9,9 @@ let DEFAULT_CONFIG = {
 
 /** 初始化 RESTful请求的 options */
 export function initRESTfulConfig(config) {
-  DEFAULT_CONFIG = { ...DEFAULT_CONFIG, ...config };
+  for (const k in config) {
+    DEFAULT_CONFIG[k] = config[k];
+  }
   return DEFAULT_CONFIG;
 }
 
