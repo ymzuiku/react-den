@@ -58,9 +58,9 @@ interface IUseDenParams {
   loading: Boolean;
   /** 初始化错误, 默认为 void 0 */
   error: String;
-  /** axios中的config */
+  /** fetch 中的config */
   config: Object;
-  /** axios中的method, 默认为 GET */
+  /** fetch 中的method, 默认为 GET */
   method: 'GET' | 'PUT' | 'POST' | 'DELETE' | any;
   /** 数据写入本地 immutable 之前进行的处理 */
   dataGetter: Function;
@@ -74,11 +74,18 @@ interface IUseDenParams {
   once: Boolean;
   /** 重复间隔 ms, 如果>0ms才会执行 */
   interval: Number;
-  /** 初始化即请求或更新, default: false */
+  /** 声明时是否进行更新/请求, default: false */
   updateAtInit: Boolean;
+  /**
+   * 是否进行更新/请求, 优先级高于UpdateAtInit, default: void 0, 设置之后会覆盖 updateAtInit
+   * 如果有两个一样的 useDen , 使用同一个 path, 可以让其他的 useDen 的 isUpdate 变为 false, 这样可以减少相同 path 的更新
+   * */
+  isUpdate: Boolean;
 }
 
 interface IUpdateDenParams {
+  /** 是否进行更新/请求, default: true */
+  nextIsUpdate: Boolean
   /** local: 请求body中的data */
   nextData: Object;
   /** REST: 请求body中的body */
@@ -92,7 +99,16 @@ interface IUpdateDenParams {
   /** 只执行一次 */
   nextOnce: Boolean;
   /** 乐观数据, 请求返回之前用于渲染的数据, 如果请求返回的数据和乐观数据不一致才会更新界面 */
-  optimistic: Object;
+  nextOptimistic: Object;
+
+
+  nextData = data,
+  nextBody = body,
+  nextVariables = variables,
+  nextLoading = loading,
+  nextError = error,
+  nextOnce = once,
+  nextOptimistic = optimistic,
 }
 
 /** 返回 数据, 更新数据函数, 清除 Interval 事件函数 */

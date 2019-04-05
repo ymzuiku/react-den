@@ -33,9 +33,9 @@ export default function useDen({
   loading,
   /** 初始化错误, 默认为 void 0 */
   error,
-  /** axios中的config */
+  /** fetch 中的config */
   config,
-  /** axios中的method, 默认为 GET */
+  /** fetch 中的method, 默认为 GET */
   method = 'GET',
   /** 数据写入本地 immutable 之前进行的处理 */
   dataGetter,
@@ -47,8 +47,10 @@ export default function useDen({
   responseErrorType = void 0,
   /** 只执行一次 */
   once = false,
-  /** 注册即请求 */
+  /** 声明时是否进行更新/请求 */
   updateAtInit = false,
+  /** 是否进行更新/请求, 优先级高于UpdateAtInit */
+  isUpdate,
   /** 重复间隔 ms, 如果>0ms才会执行 */
   interval = 0,
 }) {
@@ -59,7 +61,7 @@ export default function useDen({
   const updateValue = useCallback(
     (
       {
-        isUpdate = true,
+        nextIsUpdate = true,
         nextData = data,
         nextBody = body,
         nextVariables = variables,
@@ -98,7 +100,7 @@ export default function useDen({
       }
 
       // 初始化完毕, 根据根据情况拦截更新
-      if (!isUpdate) {
+      if (!nextIsUpdate) {
         return;
       }
 
@@ -189,7 +191,7 @@ export default function useDen({
         clearInterval(timer.current);
       }
       timer.current = setInterval(() => {
-        updateValue({ isUpdate: updateAtInit }, subKey);
+        updateValue({ nextIsUpdate: isUpdate === void 0 ? updateAtInit : isUpdate }, subKey);
       }, interval);
 
       setClearTimer(() => () => {
@@ -197,7 +199,7 @@ export default function useDen({
         cache.replaceTimer[JSON.stringify(path)] = void 0;
       });
     } else {
-      updateValue({ isUpdate: updateAtInit }, subKey);
+      updateValue({ nextIsUpdate: isUpdate === void 0 ? updateAtInit : isUpdate }, subKey);
     }
 
     // 当组件释放后, 释放setStateFunctions中的setState
