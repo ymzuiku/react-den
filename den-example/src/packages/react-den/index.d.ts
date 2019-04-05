@@ -74,8 +74,8 @@ interface IUseDenParams {
   once: Boolean;
   /** 重复间隔 ms, 如果>0ms才会执行 */
   interval: Number;
-  /** 初始化即请求 */
-  fetchAtInit: Boolean;
+  /** 初始化即请求或更新, default: false */
+  updateAtInit: Boolean;
 }
 
 interface IUpdateDenParams {

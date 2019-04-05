@@ -48,18 +48,18 @@ export default function useDen({
   /** 只执行一次 */
   once = false,
   /** 注册即请求 */
-  fetchAtInit = false,
+  updateAtInit = false,
   /** 重复间隔 ms, 如果>0ms才会执行 */
   interval = 0,
 }) {
   const [value, setValue] = useState({ loading: false, error: void 0, data: void 0 });
   const [clearTimer, setClearTimer] = useState(void 0);
   const timer = useRef(void 0);
-  const isNeedUpdate = useRef(fetchAtInit);
 
   const updateValue = useCallback(
     (
       {
+        isUpdate = true,
         nextData = data,
         nextBody = body,
         nextVariables = variables,
@@ -70,7 +70,6 @@ export default function useDen({
       },
       subKey,
     ) => {
-      console.log('in-to');
       const key = JSON.stringify(path);
 
       // 若有once, 并且设定了节流器, 则进行拦截
@@ -86,6 +85,23 @@ export default function useDen({
         cache.throttles[key] = true;
       }
 
+      // 初始化当前 path 的 use
+      if (!cache.setStateFunctions[key]) {
+        cache.setStateFunctions[key] = {};
+      }
+
+      // 初始化当前use的setState
+      if (subKey && !cache.setStateFunctions[key][subKey]) {
+        cache.setStateFunctions[key][subKey] = () => {
+          setValue(() => cache.getIn(path));
+        };
+      }
+
+      // 初始化完毕, 根据根据情况拦截更新
+      if (!isUpdate) {
+        return;
+      }
+
       // 根据传入类型来判断 kind
       if (!kind) {
         if (gql) {
@@ -97,25 +113,8 @@ export default function useDen({
         }
       }
 
-      // 初始化当前 path 的 use
-      if (!cache.setStateFunctions[key]) {
-        cache.setStateFunctions[key] = {};
-      }
-
-      // 初始化当前use的setState
-      if (subKey && !cache.setStateFunctions[key][subKey]) {
-        cache.setStateFunctions[key][subKey] = () => {
-          setValue(cache.getIn(path));
-        };
-      }
-
       // 保存乐观之前的数据, 用于乐观失败还原
       const oldState = cache.getIn(path) || {};
-
-      if (isNeedUpdate.current === false) {
-        isNeedUpdate.current = true;
-        return;
-      }
 
       // 非本地类型, 请求之前设定loading状态
       if (nextOptimistic !== null) {
@@ -190,7 +189,7 @@ export default function useDen({
         clearInterval(timer.current);
       }
       timer.current = setInterval(() => {
-        updateValue({}, subKey);
+        updateValue({ isUpdate: updateAtInit }, subKey);
       }, interval);
 
       setClearTimer(() => () => {
@@ -198,7 +197,7 @@ export default function useDen({
         cache.replaceTimer[JSON.stringify(path)] = void 0;
       });
     } else {
-      updateValue({}, subKey);
+      updateValue({ isUpdate: updateAtInit }, subKey);
     }
 
     // 当组件释放后, 释放setStateFunctions中的setState
@@ -211,7 +210,7 @@ export default function useDen({
       }
       delete cache.setStateFunctions[key][subKey];
     };
-  }, [once, fetchAtInit, interval]);
+  }, [once, updateAtInit, interval]);
 
   return [value, updateValue, clearTimer];
 }
