@@ -1,84 +1,151 @@
 ## Example
 
 ```js
-/* eslint-disable */
 import React from 'react';
-import { initDevelopment, useDen } from 'react-den';
+import { useDen, initStateToImmutable, initMiddleware, middlewareAutoLocalStorage } from 'packages/react-den';
+import useInput from 'packages/dom-hooks/useInput';
 
-initDevelopment(true);
+initStateToImmutable({
+  user: {},
+});
 
-const Sub = () => {
-  const [gql] = useDen({
-    path: ['user', 'gql'],
-    gql: `mutation AddBook($title: String){
-      addBook(title: $title, author: "tester") {
-        id
-        title
-        author
-      }
-    }`,
-    variables: { title: 'dog' },
-  });
-  const [getUser, updateGetUser] = useDen({
-    path: ['user', 'get'],
-    url: '/api/{parser}?name&age',
-    variables: { parser: 'dog', name: 'dog', age: 125 },
-  });
+initMiddleware([middlewareAutoLocalStorage('react-den-example', ['user'])], true);
 
-  const [getOnce, updateOne] = useDen({
-    path: ['user', 'getOnce'],
-    url: '/api/{parser}?name&age',
-    variables: { parser: 'dog', name: 'once', age: 125 },
-    once: true,
-  });
-  const [getInterval, setInterval, clearInterval] = useDen({
-    path: ['user', 'getInvalid'],
-    url: '/api/{parser}?name&age',
-    variables: { parser: 'dog', name: 'getInterval', age: 125 },
-    // interval: 500,
-  });
-  const [getError] = useDen({
-    path: ['user', 'get-error'],
-    url: '/api/error',
-    variables: { title: 'dog' },
-  });
-  const [postUser] = useDen({
-    path: ['user', 'get'],
-    url: '/api/dog',
-    method: 'POST',
-    body: { title: 'dog' },
-  });
-  const [postError] = useDen({
-    path: ['user', 'get-error'],
-    url: '/api/error',
-    method: 'POST',
-    body: { title: 'dog' },
-  });
+function RenderBooks({ style, loading, error, data }) {
+  if (loading) {
+    return <div>loading...</div>;
+  }
+  if (error) {
+    return <div style={{ color: '#f00' }}>{error}</div>;
+  }
+  if (data) {
+    return data.map(v => (
+      <div style={style} key={v.id}>
+        {v.title}
+      </div>
+    ));
+  }
+  return null;
+}
 
-  return (
-    <div>
-      <header>head</header>
-      <div>banner</div>
-      <div>test:</div>
-      <div>gql: {JSON.stringify(gql)}</div>
-      <div onClick={() => updateGetUser({})}>getUser: {JSON.stringify(getUser)}</div>
-      <div onClick={() => updateOne({ once: false })}>getOnce: {JSON.stringify(getOnce)}</div>
-      <div onClick={() => clearInterval({ variables: 0 })}>getInterval: {JSON.stringify(getInterval)}</div>
-      <div>getError: {JSON.stringify(getError)}</div>
-      <div>postUser: {JSON.stringify(postUser)}</div>
-      <div>postError: {JSON.stringify(postError)}</div>
-    </div>
-  );
-};
+function HomeLocal() {
+  const [localBooks, updateLocalBooks] = useDen({
+    path: ['user', 'localBooks'],
+  });
+  const [inputLocalValue, setInputLocalValue] = useInput();
 
-export default () => {
   return (
     <>
-      <Sub />
-      <Sub />
-      <Sub />
+      <RenderBooks name="local" {...localBooks} />
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          updateLocalBooks({ nextData: [...(localBooks.data || []), { id: inputLocalValue, title: inputLocalValue }] });
+          setInputLocalValue('');
+        }}
+      >
+        <input value={inputLocalValue} onChange={setInputLocalValue} />
+      </form>
     </>
   );
-};
+}
+
+function HomeFetch() {
+  const [gqlBooks, updateGqlBooks] = useDen({
+    path: ['fetch-user', 'books'],
+    dataGetter: data => {
+      if (data && data.addBook) {
+        return data.addBook;
+      }
+      return data;
+    },
+    gql: `mutation fn($title: String){ addBook(title: $title){id \n title}}`,
+  });
+  const [inputValue, setInputValue] = useInput();
+
+  return (
+    <>
+      <RenderBooks name="gql" style={{ color: '#f00' }} {...gqlBooks} />
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          updateGqlBooks({
+            nextData: { title: inputValue },
+            optimistic: [...(gqlBooks.data || []), { id: inputValue, title: inputValue }],
+          });
+          setInputValue('');
+        }}
+      >
+        <input value={inputValue} onChange={setInputValue} />
+      </form>
+    </>
+  );
+}
+
+function HomeGqlQuery() {
+  const [hello] = useDen({
+    path: ['user', 'hello'],
+    gql: `query {hello}`,
+  });
+
+  const [dog] = useDen({
+    path: ['dog', 'theURLdog'],
+    method: 'GET',
+    url: 'http://127.0.0.1:5002/api/dog',
+  });
+
+  return (
+    <>
+      <div>home: {JSON.stringify(hello)}</div>
+      <div>dog: {JSON.stringify(dog)}</div>
+    </>
+  );
+}
+
+function HomeGqlMutation() {
+  const [gqlBooks, updateGqlBooks] = useDen({
+    path: ['gql-user', 'books'],
+    dataGetter: data => {
+      if (data && data.addBook) {
+        return data.addBook;
+      }
+      return data;
+    },
+    gql: `mutation fn($title: String){ addBook(title: $title){id \n title}}`,
+  });
+  const [inputValue, setInputValue] = useInput();
+
+  return (
+    <>
+      <RenderBooks name="gql" style={{ color: '#f00' }} {...gqlBooks} />
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          updateGqlBooks({
+            nextData: { title: inputValue },
+            optimistic: [...(gqlBooks.data || []), { id: inputValue, title: inputValue }],
+          });
+          setInputValue('');
+        }}
+      >
+        <input value={inputValue} onChange={setInputValue} />
+      </form>
+    </>
+  );
+}
+
+function Home() {
+  return (
+    <>
+      <HomeLocal />
+      <HomeFetch />
+      <HomeGqlQuery />
+      <HomeGqlMutation />
+    </>
+  );
+}
+
+export default Home;
+
 
 ```
