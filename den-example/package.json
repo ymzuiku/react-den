@@ -1,6 +1,6 @@
 {
   "name": "react-den",
-  "version": "0.0.9",
+  "version": "0.0.12",
   "description": "react-den",
   "private": true,
   "scripts": {
@@ -19,8 +19,8 @@
     "graphql-request": "^1.8.2",
     "immutable": "^4.0.0-rc.12",
     "pure-fn": "^0.0.2",
-    "react": "^16.8.3",
-    "react-dom": "^16.8.3",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "react-router-dom": "^4.3.1"
   },
   "devDependencies": {

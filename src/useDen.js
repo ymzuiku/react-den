@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect, useRef } from 'react';
 import fetchByGraphql from './fetchByGraphql';
 import fetchByRESTful from './fetchByRESTful';
 import cache from './cache';
@@ -15,19 +15,19 @@ export function fixDataGetter(dataGetter, data) {
 
 /** 同质化服务端数据和本地数据的读写 */
 export default function useDen({
-  /** local|graphql|RESTful 强制设定类型, 不根据 gql 或则 url 进行判断 */
+  /** local|graphql|REST 强制设定类型, 不根据 gql 或则 url 进行判断 */
   kind,
   /** 不可变数据读写路径 */
   path,
   /** graphql 的 query 或 mutation */
   gql,
-  /** RESTful 的 url */
+  /** REST 的 url */
   url,
   /** local: 请求body中的data */
   data = null,
-  /** RESTful: 请求body中的body */
+  /** REST: 请求body中的body */
   body = null,
-  /** graphql: variables对象 或 RESTful GET URL地址参数 */
+  /** graphql: variables对象 或 REST GET URL地址参数 */
   variables = null,
   /** 初始化loading, 默认为true */
   loading,
@@ -52,9 +52,10 @@ export default function useDen({
   /** 重复间隔 ms, 如果>0ms才会执行 */
   interval = 0,
 }) {
-  const [value, setValue] = React.useState({ loading: false, error: void 0, data: void 0 });
-  const [clearTimer, setClearTimer] = React.useState(void 0);
-  const timer = React.useRef({ current: void 0 });
+  const [value, setValue] = useState({ loading: false, error: void 0, data: void 0 });
+  const [clearTimer, setClearTimer] = useState(void 0);
+  const timer = useRef(void 0);
+  const isNeedUpdate = useRef(fetchAtInit);
 
   const updateValue = (
     {
@@ -64,11 +65,11 @@ export default function useDen({
       nextLoading = loading,
       nextError = error,
       nextOnce = once,
-      optimistic: nextOptimistic = null,
+      nextOptimistic = optimistic,
     },
     subKey,
   ) => {
-    const key = path.join(',');
+    const key = JSON.stringify(path);
 
     // 若有once, 并且设定了节流器, 则进行拦截
     if (nextOnce && cache.throttles[key]) {
@@ -88,7 +89,7 @@ export default function useDen({
       if (gql) {
         kind = 'graphql';
       } else if (url) {
-        kind = 'RESTful';
+        kind = 'REST';
       } else {
         kind = 'local';
       }
@@ -109,16 +110,25 @@ export default function useDen({
     // 保存乐观之前的数据, 用于乐观失败还原
     const oldState = cache.getIn(path) || {};
 
+    if (isNeedUpdate.current === false) {
+      isNeedUpdate.current = true;
+      return;
+    }
+
     // 非本地类型, 请求之前设定loading状态
     if (nextOptimistic !== null) {
-      cache.setIn(path, { data: fixDataGetter(dataGetter, nextOptimistic), loading: nextLoading, error: nextError });
+      cache.setIn(path, {
+        data: fixDataGetter(dataGetter, nextOptimistic),
+        loading: nextLoading || false,
+        error: nextError,
+      });
     } else if (kind !== 'local') {
       cache.setIn(path, { loading: true });
     }
 
     // 更新本地状态
     else {
-      cache.setIn(path, { data: fixDataGetter(dataGetter, nextData), loading: nextLoading, error: nextError });
+      cache.setIn(path, { data: fixDataGetter(dataGetter, nextData), loading: nextLoading || false, error: nextError });
     }
 
     // 同步注册的页面进行更新
@@ -126,28 +136,30 @@ export default function useDen({
       cache.setStateFunctions[key][k]();
     }
 
-    // 通过请求更新本地状态
-    if (kind !== 'local') {
-      let fetchFunction;
-
-      // 根据kind使用graphql或者restful进行请求
-      if (kind === 'graphql') {
-        fetchFunction = fetchByGraphql;
-      } else if (kind === 'RESTful') {
-        fetchFunction = fetchByRESTful;
-      }
-      fetchFunction({
+    // 根据kind使用graphql或者restful进行请求
+    if (kind === 'graphql') {
+      fetchByGraphql({
         gql,
-        url,
         variables: nextVariables,
-        data: nextData,
-        body: nextBody,
         path,
         dataGetter,
-        optimistic: nextOptimistic,
         oldState,
+      }).then(() => {
+        // 请求完之后更新所有注册过的页面
+        for (const k in cache.setStateFunctions[key]) {
+          cache.setStateFunctions[key][k]();
+        }
+      });
+    } else if (kind === 'REST') {
+      fetchByRESTful({
+        url,
         method,
+        body: nextBody,
+        variables: nextVariables,
         config,
+        path,
+        dataGetter,
+        oldState,
         responseType,
         responseErrorType,
       }).then(() => {
@@ -159,33 +171,32 @@ export default function useDen({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (cache.isDev && (!path || path.length === 0)) {
       throw new Error('[useDen] path is empty');
     }
     SUB_KEY++;
     const subKey = SUB_KEY;
 
-    if (fetchAtInit) {
-      updateValue({ once, interval, data, variables, body, loading, error, optimistic }, subKey);
-    }
-
     if (interval > 0) {
+      if (timer.current) {
+        clearInterval(timer.current);
+      }
       timer.current = setInterval(() => {
-        updateValue({ once, interval, data, variables, body, loading, error, optimistic }, subKey);
+        updateValue({}, subKey);
       }, interval);
 
       setClearTimer(() => () => {
         clearInterval(timer.current);
-        timer.current = void 0;
+        cache.replaceTimer[JSON.stringify(path)] = void 0;
       });
     } else {
-      updateValue({ once, interval, data, variables, body, loading, error, optimistic }, subKey);
+      updateValue({}, subKey);
     }
 
     // 当组件释放后, 释放setStateFunctions中的setState
     return () => {
-      const key = path.join(',');
+      const key = JSON.stringify(path);
 
       // 清空循环请求
       if (typeof clearTimer === 'function') {
@@ -193,6 +204,7 @@ export default function useDen({
       }
       delete cache.setStateFunctions[key][subKey];
     };
-  }, [JSON.stringify(path), kind, url, gql, method, once]);
+  }, [kind, url, gql, method, once, JSON.stringify(path), fetchAtInit, interval]);
+
   return [value, updateValue, clearTimer];
 }

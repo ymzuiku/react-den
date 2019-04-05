@@ -40,19 +40,19 @@ interface ICache {
 export const cache: ICache;
 
 interface IUseDenParams {
-  /** local|graphql|RESTful 强制设定类型, 不根据 gql 或则 url 进行判断 */
-  kind: 'local' | 'graphql' | 'RESTful';
+  /** local|graphql|REST 强制设定类型, 不根据 gql 或则 url 进行判断 */
+  kind: 'local' | 'graphql' | 'REST';
   /** 不可变数据读写路径 */
   path: Array<String>;
   /** graphql 的 query 或 mutation */
   gql: String;
-  /** RESTful 的 url */
+  /** REST 的 url */
   url: String;
   /** local: 请求body中的data */
   data: Object;
-  /** RESTful: 请求body中的body */
+  /** REST: 请求body中的body */
   body: Object;
-  /** graphql: variables对象 或 RESTful GET URL地址参数 */
+  /** graphql: variables对象 或 REST GET URL地址参数 */
   variables: Object;
   /** 初始化loading, 默认为true */
   loading: Boolean;
@@ -81,9 +81,9 @@ interface IUseDenParams {
 interface IUpdateDenParams {
   /** local: 请求body中的data */
   nextData: Object;
-  /** RESTful: 请求body中的body */
+  /** REST: 请求body中的body */
   nextBody: Object;
-  /** graphql: variables对象 或 RESTful GET URL地址参数 */
+  /** graphql: variables对象 或 REST GET URL地址参数 */
   nextVariables: Object;
   /** 初始化loading, 默认为true */
   nextLoading: Boolean;
@@ -139,7 +139,7 @@ interface IRESTfulConfig {
   headers: IHeader | Object;
 }
 
-/** 初始化 RESTful请求的 options */
+/** 初始化 REST 请求的 options */
 export function initRESTfulConfig(config: IRESTfulConfig): IRESTfulConfig;
 
 /** 初始化development状态, 打开打印及错误日志 */

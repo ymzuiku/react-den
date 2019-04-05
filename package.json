@@ -1,6 +1,6 @@
 {
   "name": "react-den",
-  "version": "0.0.9",
+  "version": "0.0.12",
   "description": "react-den",
   "dependencies": {
     "graphql-request": "^1.8.2",
@@ -9,6 +9,10 @@
   },
   "main": "lib/index.js",
   "types": "src/index.d.ts",
+  "scripts": {
+    "lib": "cd den-example && yarn lib",
+    "start": "cd den-example && yarn start"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ymzuiku/react-den.git"

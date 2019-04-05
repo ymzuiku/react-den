@@ -22,6 +22,7 @@ const cache = {
   /** 用于跨组件更新状态的函数, 函数针对于 state的路径进行分组 */
   setStateFunctions: {},
   throttles: {},
+  replaceTimer: {},
   /** 每当更新时, 都会执行middlewares中的函数 */
   middlewares: [],
   /** 获取cache中的数据, 请传入数组 */

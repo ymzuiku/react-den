@@ -33,7 +33,7 @@ export function middlewareLog({
     if (cache.isDev) {
       const log = (format = true) => {
         const timeString = formatTime(void 0, [void 0, void 0, void 0, ':', ':', ' ', 'ms']);
-        const key = path.join(', ');
+        const key = JSON.stringify(path);
         const loading = nextState && nextState.loading;
         const error = nextState && nextState.error;
         let statusString = '';
@@ -113,7 +113,7 @@ export function middlewareAutoLocalStorage(appKey = 'react-den-key-need-replace'
   middlewareListener.isUseMiddlewareAutoLocalStorage = true;
 
   function pathToKey(path) {
-    return `|-- ${path.join(', ')}`;
+    return `|-- ${JSON.stringify(path)}`;
   }
 
   const pathKeys = keys.map(v => {
