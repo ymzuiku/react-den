@@ -1,6 +1,6 @@
 {
   "name": "react-den",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "react-den",
   "private": true,
   "scripts": {
@@ -13,6 +13,7 @@
     "dll-prod": "cross-env BUILD_DLL=true node scripts/build.js",
     "lib": "cross-env BUILD_LIB=true node scripts/build.js",
     "lint-ci": "lint-staged",
+    "fast-publish": "yarn lib && cd .. && npm publish --access public",
     "test": "node scripts/test.js"
   },
   "dependencies": {
