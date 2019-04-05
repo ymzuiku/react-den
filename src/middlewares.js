@@ -138,7 +138,6 @@ export function middlewareAutoLocalStorage(appKey = 'react-den-key-need-replace'
     });
   }
 
-  globalCache.setIn(['__supine__'], { data: { init: true, localStateLoaded: true } });
   return () => {
     pathKeys.forEach(watchPath => {
       const watchString = pathToKey(watchPath);

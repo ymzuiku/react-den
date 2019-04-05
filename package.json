@@ -1,6 +1,6 @@
 {
   "name": "react-den",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "react-den",
   "dependencies": {
     "graphql-request": "^1.8.2",

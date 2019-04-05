@@ -60,21 +60,18 @@ const cache = {
       });
     }
 
-    if (cache.isDev) {
-      if (cache.webDebugToolKey) {
-        console.log('xx');
-        const session = {};
+    if (cache.webDebugToolKey) {
+      const session = {};
 
-        cache.state.forEach((v, k) => {
-          session[k] = v;
-        });
-        // 初始化时清除历史debug记录
-        if (!initCache.isClearOldStorage) {
-          window.sessionStorage.setItem(cache.webDebugToolKey, '{}');
-          initCache.isClearOldStorage = true;
-        }
-        window.sessionStorage.setItem(cache.webDebugToolKey, JSON.stringify(session));
+      cache.state.forEach((v, k) => {
+        session[k] = v;
+      });
+      // 初始化时清除历史debug记录
+      if (!initCache.isClearOldStorage) {
+        window.sessionStorage.setItem(cache.webDebugToolKey, '{}');
+        initCache.isClearOldStorage = true;
       }
+      window.sessionStorage.setItem(cache.webDebugToolKey, JSON.stringify(session));
     }
   },
   /** 打印整个state, 非常消耗性能 */
