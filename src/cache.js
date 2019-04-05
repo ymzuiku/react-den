@@ -60,7 +60,7 @@ const cache = {
       cache.state.forEach((v, k) => {
         session[k] = v;
       });
-      window.sessionStorage.setItem('react-den-dev', JSON.stringify(session));
+      window.sessionStorage.setItem('react-den-debug-tool', JSON.stringify(session));
     }
   },
   /** 打印整个state, 非常消耗性能 */

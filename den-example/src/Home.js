@@ -1,12 +1,19 @@
 /* eslint-disable */
 import React from 'react';
-import { useDen, initStateToImmutable, initMiddleware, middlewareAutoLocalStorage } from 'packages/react-den';
+import {
+  useDen,
+  initDevelopment,
+  initStateToImmutable,
+  initMiddleware,
+  middlewareAutoLocalStorage,
+} from 'packages/react-den';
 
+initDevelopment(true);
 initStateToImmutable({
   user: {},
 });
 
-initMiddleware([middlewareAutoLocalStorage('react-den-example', ['user'])], true);
+// initMiddleware([middlewareAutoLocalStorage('react-den-example', ['user'])], true);
 
 function RenderBooks({ style, loading, error, data }) {
   if (loading) {
@@ -62,7 +69,6 @@ function HomeFetch() {
   });
 
   // 这个虽然是相同的 path, 但是不会更新, 因为设置了 isSetState:false
-  // eslint-disable-next-line
   const [gqlBooks2, updateGqlBooks2] = useDen({
     path: ['fetch-user', 'books'],
     dataGetter: data => {
@@ -84,7 +90,7 @@ function HomeFetch() {
           e.preventDefault();
           const input = document.querySelector('#home-fetch');
           const inputValue = input.value;
-          updateGqlBooks({
+          updateGqlBooks2({
             nextData: { title: inputValue },
             optimistic: [...(gqlBooks.data || []), { id: inputValue, title: inputValue }],
           });

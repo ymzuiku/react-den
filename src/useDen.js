@@ -47,10 +47,10 @@ export default function useDen({
   responseErrorType = void 0,
   /** 只执行一次 */
   once = false,
-  /** 声明时是否进行更新/请求 */
+  /** 声明时是否进行请求 */
   updateAtInit = false,
-  /** 是否进行更新/请求, 优先级高于UpdateAtInit */
-  isUpdate,
+  /** 如果希望只做请求, 不做更新, 设置成 false */
+  isSetState = true,
   /** 重复间隔 ms, 如果>0ms才会执行 */
   interval = 0,
 }) {
@@ -58,10 +58,12 @@ export default function useDen({
   const [clearTimer, setClearTimer] = useState(void 0);
   const timer = useRef(void 0);
 
+  // 减少函数重新声明
   const updateValue = useCallback(
     (
       {
         nextIsUpdate = true,
+        nextIsSetState = isSetState,
         nextData = data,
         nextBody = body,
         nextVariables = variables,
@@ -93,7 +95,7 @@ export default function useDen({
       }
 
       // 初始化当前use的setState
-      if (subKey && !cache.setStateFunctions[key][subKey]) {
+      if (nextIsSetState && subKey && !cache.setStateFunctions[key][subKey]) {
         cache.setStateFunctions[key][subKey] = () => {
           setValue(() => cache.getIn(path));
         };
@@ -128,7 +130,6 @@ export default function useDen({
       } else if (kind !== 'local') {
         cache.setIn(path, { loading: true });
       }
-
       // 更新本地状态
       else {
         cache.setIn(path, {
@@ -139,8 +140,10 @@ export default function useDen({
       }
 
       // 同步注册的页面进行更新
-      for (const k in cache.setStateFunctions[key]) {
-        cache.setStateFunctions[key][k]();
+      if (nextIsSetState) {
+        for (const k in cache.setStateFunctions[key]) {
+          cache.setStateFunctions[key][k]();
+        }
       }
 
       // 根据kind使用graphql或者restful进行请求
@@ -153,8 +156,10 @@ export default function useDen({
           oldState,
         }).then(() => {
           // 请求完之后更新所有注册过的页面
-          for (const k in cache.setStateFunctions[key]) {
-            cache.setStateFunctions[key][k]();
+          if (nextIsSetState) {
+            for (const k in cache.setStateFunctions[key]) {
+              cache.setStateFunctions[key][k]();
+            }
           }
         });
       } else if (kind === 'REST') {
@@ -171,8 +176,10 @@ export default function useDen({
           responseErrorType,
         }).then(() => {
           // 请求完之后更新所有注册过的页面
-          for (const k in cache.setStateFunctions[key]) {
-            cache.setStateFunctions[key][k]();
+          if (nextIsSetState) {
+            for (const k in cache.setStateFunctions[key]) {
+              cache.setStateFunctions[key][k]();
+            }
           }
         });
       }
@@ -191,7 +198,7 @@ export default function useDen({
         clearInterval(timer.current);
       }
       timer.current = setInterval(() => {
-        updateValue({ nextIsUpdate: isUpdate === void 0 ? updateAtInit : isUpdate }, subKey);
+        updateValue({ nextIsUpdate: updateAtInit });
       }, interval);
 
       setClearTimer(() => () => {
@@ -199,7 +206,7 @@ export default function useDen({
         cache.replaceTimer[JSON.stringify(path)] = void 0;
       });
     } else {
-      updateValue({ nextIsUpdate: isUpdate === void 0 ? updateAtInit : isUpdate }, subKey);
+      updateValue({ nextIsUpdate: updateAtInit }, subKey);
     }
 
     // 当组件释放后, 释放setStateFunctions中的setState
@@ -212,7 +219,7 @@ export default function useDen({
       }
       delete cache.setStateFunctions[key][subKey];
     };
-  }, [once, updateAtInit, interval]);
+  }, [isSetState, once, updateAtInit, interval]);
 
   return [value, updateValue, clearTimer];
 }

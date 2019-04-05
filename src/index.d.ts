@@ -76,14 +76,16 @@ interface IUseDenParams {
   interval: Number;
   /** 声明时是否进行更新/请求, default: false */
   updateAtInit: Boolean;
-  /**
-   * 是否进行更新/请求, 优先级高于UpdateAtInit, default: void 0, 设置之后会覆盖 updateAtInit
-   * 如果有两个一样的 useDen , 使用同一个 path, 可以让其他的 useDen 的 isUpdate 变为 false, 这样可以减少相同 path 的更新
-   * */
-  isUpdate: Boolean;
+  /** 如果希望只做请求, 不做更新, 设置成 false */
+  isSetState: Boolean;
 }
 
 interface IUpdateDenParams {
+  /**
+   * 是否进行请求之后是否更新: default: true
+   * 如果有两个 useDen 使用同一个 path, 可以让其他的 useDen 的 isSetState 变为 false, 这样可以减少相同 path 的更新
+   * */
+  nextIsSetState: Boolean;
   /** 是否进行更新/请求, default: true */
   nextIsUpdate: Boolean
   /** local: 请求body中的data */
@@ -100,15 +102,6 @@ interface IUpdateDenParams {
   nextOnce: Boolean;
   /** 乐观数据, 请求返回之前用于渲染的数据, 如果请求返回的数据和乐观数据不一致才会更新界面 */
   nextOptimistic: Object;
-
-
-  nextData = data,
-  nextBody = body,
-  nextVariables = variables,
-  nextLoading = loading,
-  nextError = error,
-  nextOnce = once,
-  nextOptimistic = optimistic,
 }
 
 /** 返回 数据, 更新数据函数, 清除 Interval 事件函数 */

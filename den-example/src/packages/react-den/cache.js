@@ -12,6 +12,10 @@ function fullPathWithImmutable(obj, path) {
   }
 }
 
+const initCache = {
+  isClearOldStorage: false,
+};
+
 const cache = {
   // /** appKey用于本地存储的键 */
   // appKey: 'react-den-default-appKey',
@@ -60,6 +64,11 @@ const cache = {
       cache.state.forEach((v, k) => {
         session[k] = v;
       });
+      // 初始化时清除历史debug记录
+      if (initCache.isClearOldStorage) {
+        window.sessionStorage.setItem('react-den-debug-tool', '{}');
+        initCache.isClearOldStorage = true;
+      }
       window.sessionStorage.setItem('react-den-debug-tool', JSON.stringify(session));
     }
   },

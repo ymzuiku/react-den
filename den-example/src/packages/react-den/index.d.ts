@@ -152,5 +152,5 @@ interface IRESTfulConfig {
 export function initRESTfulConfig(config: IRESTfulConfig): IRESTfulConfig;
 
 /** 初始化development状态, 打开打印及错误日志 */
-export function initDevelopment(): Array<IMiddleware>;
+export function initDevelopment(isDev:Boolean): Array<IMiddleware>;
 
