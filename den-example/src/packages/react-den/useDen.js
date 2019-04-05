@@ -70,6 +70,7 @@ export default function useDen({
       },
       subKey,
     ) => {
+      console.log('in-to');
       const key = JSON.stringify(path);
 
       // 若有once, 并且设定了节流器, 则进行拦截
@@ -210,7 +211,7 @@ export default function useDen({
       }
       delete cache.setStateFunctions[key][subKey];
     };
-  }, [once, fetchAtInit, interval, path, updateValue, clearTimer]);
+  }, [once, fetchAtInit, interval]);
 
   return [value, updateValue, clearTimer];
 }
