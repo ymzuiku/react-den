@@ -1,11 +1,10 @@
 /* eslint-disable */
 import React from 'react';
-import { useDen, initMiddleware, cache } from 'packages/react-den';
+import { useDen, initMiddleware, middlewareAutoLocalStorage, cache as den } from 'packages/react-den';
 
-cache.isDev = true;
-cache.webDebugToolKey = 'den-example-debug';
+den.webDebugToolKey = 'den-example-debug';
 
-// initMiddleware([middlewareAutoLocalStorage('react-den-example', ['user'])], true);
+initMiddleware([middlewareAutoLocalStorage('react-den-example', [['aa', 'bb', 'cc']])], true);
 
 function RenderBooks({ style, loading, error, data }) {
   if (loading) {
@@ -26,7 +25,7 @@ function RenderBooks({ style, loading, error, data }) {
 
 function HomeLocal() {
   const [localBooks, updateLocalBooks] = useDen({
-    path: ['user', 'localBooks'],
+    path: ['aa', 'bb', 'cc'],
   });
 
   return (
@@ -151,8 +150,8 @@ function HomeGqlMutation() {
 function Home() {
   return (
     <>
-      {/*<HomeLocal />*/}
-      <HomeFetch />
+      <HomeLocal />
+      {/*<HomeFetch />*/}
       {/*<HomeGqlQuery />*/}
       {/*<HomeGqlMutation />*/}
     </>
