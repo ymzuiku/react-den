@@ -3,7 +3,6 @@ import React from 'react';
 import { useDen, initMiddleware, middlewareAutoLocalStorage, cache as den } from 'packages/react-den';
 
 den.webDebugToolKey = 'den-example-debug';
-
 initMiddleware([middlewareAutoLocalStorage('react-den-example', [['aa', 'bb', 'cc']])], true);
 
 function RenderBooks({ style, loading, error, data }) {
@@ -55,7 +54,6 @@ function HomeFetch() {
       return data;
     },
     gql: `mutation fn($title: String){ addBook(title: $title){id \n title}}`,
-
     // isSetState: false,
   });
 

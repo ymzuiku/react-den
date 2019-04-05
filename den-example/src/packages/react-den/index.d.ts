@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { Map } from 'immutable';
 
 /** den 数据 */
@@ -15,6 +14,7 @@ interface IMiddlewareParams {
   value: IValue;
 }
 
+const IMiddleware = (params: IMiddlewareParams) => any;
 
 interface ICache {
   // /** appKey用于本地存储的键 */
@@ -39,6 +39,7 @@ interface ICache {
   errorMiddlewares: Array<IMiddleware>;
 }
 
+export const cache: ICache;
 
 interface IUseDenParams {
   /** local|graphql|REST 强制设定类型, 不根据 gql 或则 url 进行判断 */
@@ -88,7 +89,7 @@ interface IUpdateDenParams {
    * */
   nextIsSetState: Boolean;
   /** 是否进行更新/请求, default: true */
-  nextIsUpdate: Boolean;
+  nextIsUpdate: Boolean
   /** local: 请求body中的data */
   nextData: Object;
   /** REST: 请求body中的body */
@@ -105,6 +106,25 @@ interface IUpdateDenParams {
   nextOptimistic: Object;
 }
 
+/** 返回 数据, 更新数据函数, 清除 Interval 事件函数 */
+export default function useDen(params: IUseDenParams): [IValue, (params: IUpdateDenParams) => void, clearIntervalTimer];
+
+export function useDen(params: IUseDenParams): [IValue, (params: IUpdateDenParams) => void, clearIntervalTimer];
+
+/** 初始化 cache.state 为一个 immutable 对象 */
+export function initStateToImmutable(obj): Map;
+
+/** 添加中间件, 中间件是一个函数, 并且返回一个函数, 在每次更新状态的时候,会执行中间件的返回值, 并且传入上下文状态 */
+export function initMiddleware(middlewares: Array<IMiddleware>, onlyMerge: Boolean): Array<IMiddleware>;
+
+/** 添加处理错误的中间件, 中间件是一个函数, 并且返回一个函数, 在每次获取错误状态的时候,会执行中间件的返回值, 并且传入上下文状态 */
+export function initErrorMiddleware(middlewares: Array<IMiddleware>, onlyMerge: Boolean): Array<IMiddleware>;
+
+interface IGraphqlConfig {
+  url: String;
+  errorFn: Function;
+}
+
 interface IMiddlewareLogParams {
   isHidden: Boolean;
   isFormat: Boolean;
@@ -113,10 +133,14 @@ interface IMiddlewareLogParams {
   titleMaxLength: Number;
 }
 
-interface IGraphqlConfig {
-  url: String;
-  errorFn: Function;
-}
+/** 打印日志中间件, 默认只在dev环境下打印, 并且不在移动环境下打印 */
+export function middlewareLog(params: IMiddlewareLogParams): void;
+
+/** 用于自动存储的中间件, 传入一个多维数组, 数组每个值都是immutable对象的 getIn 路径 */
+export function middlewareAutoLocalStorage(appKey: String, keys: Array<String | Array<String>>): void;
+
+/** 初始化 graphql URL */
+export function initGraphqlConfig(config: IGraphqlConfig): IGraphqlConfig;
 
 interface IHeader {
   'Content-Type': String;
@@ -126,46 +150,7 @@ interface IRESTfulConfig {
   headers: IHeader | Object;
 }
 
-declare function IMiddleware (params: IMiddlewareParams): any;
-
-/** 返回 数据, 更新数据函数, 清除 Interval 事件函数 */
-declare function useDen(params: IUseDenParams): [IValue, (params: IUpdateDenParams) => void, clearIntervalTimer];
-
-/** 初始化 cache.state 为一个 immutable 对象 */
-declare function initStateToImmutable(obj): Map;
-
-/** 添加中间件, 中间件是一个函数, 并且返回一个函数, 在每次更新状态的时候,会执行中间件的返回值, 并且传入上下文状态 */
-declare function initMiddleware(middlewares: Array<IMiddleware>, onlyMerge: Boolean): Array<IMiddleware>;
-
-/** 添加处理错误的中间件, 中间件是一个函数, 并且返回一个函数, 在每次获取错误状态的时候,会执行中间件的返回值, 并且传入上下文状态 */
-declare function initErrorMiddleware(middlewares: Array<IMiddleware>, onlyMerge: Boolean): Array<IMiddleware>;
-
-
-/** 打印日志中间件, 默认只在dev环境下打印, 并且不在移动环境下打印 */
-declare function middlewareLog(params: IMiddlewareLogParams): void;
-
-/** 用于自动存储的中间件, 传入一个多维数组, 数组每个值都是immutable对象的 getIn 路径 */
-declare function middlewareAutoLocalStorage(appKey: String, keys: Array<String | Array<any>>): void;
-
-/** 初始化 graphql URL */
-declare function initGraphqlConfig(config: IGraphqlConfig): IGraphqlConfig;
-
 /** 初始化 REST 请求的 options */
-declare function initRESTfulConfig(config: IRESTfulConfig): IRESTfulConfig;
-
-declare var cache: ICache;
-
-export default useDen;
-
-export {
-  cache,
-  initStateToImmutable,
-  initMiddleware,
-  initErrorMiddleware,
-  middlewareLog,
-  middlewareAutoLocalStorage,
-  initGraphqlConfig,
-  initRESTfulConfig,
-}
+export function initRESTfulConfig(config: IRESTfulConfig): IRESTfulConfig;
 
 
