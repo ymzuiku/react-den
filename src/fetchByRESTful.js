@@ -23,7 +23,7 @@ export default function({
   variables,
   config = DEFAULT_CONFIG,
   path,
-  dataGetter,
+  dataSetter,
   oldState,
   /** 用于解析body的方法 */
   responseType = 'json',
@@ -60,8 +60,8 @@ export default function({
           res.data.then(theData => {
             const { ok, status } = res;
 
-            if (typeof dataGetter === 'function') {
-              theData = dataGetter(theData);
+            if (typeof dataSetter === 'function') {
+              theData = dataSetter(theData);
             }
             cache.setIn(path, { data: theData, loading: false, error: ok ? void 0 : status });
             resolve(cache.state.getIn(path), cache);
@@ -70,8 +70,8 @@ export default function({
           let { data: theData } = res;
           const { ok, status } = res;
 
-          if (typeof dataGetter === 'function') {
-            theData = dataGetter(theData);
+          if (typeof dataSetter === 'function') {
+            theData = dataSetter(theData);
           }
           cache.setIn(path, { data: theData, loading: false, error: ok ? void 0 : status });
           resolve(cache.state.getIn(path), cache);

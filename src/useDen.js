@@ -5,10 +5,10 @@ import cache from './cache';
 
 let SUB_KEY = 0;
 
-/** 如果有dataGetter, 使用dataGetter处理data */
-export function fixDataGetter(dataGetter, data) {
-  if (typeof dataGetter === 'function') {
-    return dataGetter(data);
+/** 如果有dataSetter 使用dataSetter处理data */
+export function fixDataSetter(dataSetter, data) {
+  if (typeof dataSetter === 'function') {
+    return dataSetter(data);
   }
   return data;
 }
@@ -38,7 +38,7 @@ export default function useDen({
   /** fetch 中的method, 默认为 GET */
   method = 'GET',
   /** 数据写入本地 immutable 之前进行的处理 */
-  dataGetter,
+  dataSetter,
   /** 乐观数据, 请求返回之前用于渲染的数据, 如果请求返回的数据和乐观数据不一致才会更新界面 */
   optimistic = null,
   /** 请求返回之后使用解析函数的类型, 默认: 'json' */
@@ -50,12 +50,13 @@ export default function useDen({
   /** 声明时是否进行请求 */
   updateAtInit = false,
   /** 如果希望只做请求, 不做更新, 设置成 false */
-  isSetState = true,
+  isUpdate = true,
   /** 重复间隔 ms, 如果>0ms才会执行 */
   interval = 0,
-  useLoading = false,
+  /** loading 状态是否激发重绘 */
+  updateAtLoading = false,
 }) {
-  const [value, setValue] = useState({ loading: false, error: void 0, data: {} });
+  const [value, setValue] = useState({ loading: false, error: void 0, data: void 0 });
   const [clearTimer, setClearTimer] = useState(void 0);
   const timer = useRef(void 0);
   const key = JSON.stringify(path);
@@ -64,8 +65,9 @@ export default function useDen({
   const updateValue = useCallback(
     (
       {
-        nextIsUpdate = true,
-        nextIsSetState = isSetState,
+        nextUpdateAtInit = true,
+        nextUpdateAtLoading = updateAtLoading,
+        nextIsUpdate = isUpdate,
         nextData = data,
         nextBody = body,
         nextVariables = variables,
@@ -73,7 +75,6 @@ export default function useDen({
         nextError = error,
         nextOnce = once,
         nextOptimistic = optimistic,
-        nextUseLoading = useLoading,
       },
       subKey,
     ) => {
@@ -96,15 +97,10 @@ export default function useDen({
       }
 
       // 初始化当前use的setState
-      if (nextIsSetState && subKey && !cache.setStateFunctions[key][subKey]) {
+      if (nextIsUpdate && subKey && !cache.setStateFunctions[key][subKey]) {
         cache.setStateFunctions[key][subKey] = () => {
           setValue(() => cache.getIn(path));
         };
-      }
-
-      // 初始化完毕, 根据根据情况拦截更新
-      if (!nextIsUpdate) {
-        return;
       }
 
       // 根据传入类型来判断 kind
@@ -121,30 +117,34 @@ export default function useDen({
       // 保存乐观之前的数据, 用于乐观失败还原
       const oldState = cache.getIn(path) || {};
 
-      // 如果开启loading状态, 非本地类型, 请求之前设定loading状态
-      if (nextUseLoading) {
-        if (nextOptimistic !== null) {
-          cache.setIn(path, {
-            data: fixDataGetter(dataGetter, nextOptimistic),
-            loading: nextLoading || false,
-            error: nextError,
-          });
-        } else if (kind !== 'local') {
-          cache.setIn(path, { loading: true });
-        }
-        // 更新本地状态
-        else {
-          cache.setIn(path, {
-            data: fixDataGetter(dataGetter, nextData),
-            loading: nextLoading || false,
-            error: nextError,
-          });
-        }
+      if (nextOptimistic !== null) {
+        cache.setIn(path, {
+          data: fixDataSetter(dataSetter, nextOptimistic),
+          loading: nextLoading || false,
+          error: nextError,
+        });
+      } else if (kind !== 'local') {
+        cache.setIn(path, { loading: true });
+      }
+      // 更新本地状态
+      else {
+        cache.setIn(path, {
+          data: fixDataSetter(dataSetter, nextData),
+          loading: nextLoading || false,
+          error: nextError,
+        });
       }
 
-      // 同步注册的页面进行更新
-      for (const k in cache.setStateFunctions[key]) {
-        cache.setStateFunctions[key][k]();
+      // 初始化完毕, 根据根据情况拦截更新
+      if (!nextUpdateAtInit) {
+        return;
+      }
+
+      // 如果开启loading状态, 非本地类型, 请求之前设定loading状态
+      if (kind === 'local' || nextUpdateAtLoading) {
+        for (const k in cache.setStateFunctions[key]) {
+          cache.setStateFunctions[key][k]();
+        }
       }
 
       // 根据kind使用graphql或者restful进行请求
@@ -153,7 +153,7 @@ export default function useDen({
           gql,
           variables: nextVariables,
           path,
-          dataGetter,
+          dataSetter,
           oldState,
         }).then(() => {
           // 请求完之后更新所有注册过的页面
@@ -169,7 +169,7 @@ export default function useDen({
           variables: nextVariables,
           config,
           path,
-          dataGetter,
+          dataSetter,
           oldState,
           responseType,
           responseErrorType,
@@ -195,7 +195,7 @@ export default function useDen({
         clearInterval(timer.current);
       }
       timer.current = setInterval(() => {
-        updateValue({ nextIsUpdate: updateAtInit });
+        updateValue({ nextUpdateAtInit: updateAtInit });
       }, interval);
 
       setClearTimer(() => () => {
@@ -203,7 +203,7 @@ export default function useDen({
         cache.replaceTimer[JSON.stringify(path)] = void 0;
       });
     } else {
-      updateValue({ nextIsUpdate: updateAtInit }, subKey);
+      updateValue({ nextUpdateAtInit: updateAtInit }, subKey);
     }
 
     // 当组件释放后, 释放setStateFunctions中的setState
@@ -214,7 +214,7 @@ export default function useDen({
       }
       delete cache.setStateFunctions[key][subKey];
     };
-  }, [key, isSetState, once, updateAtInit, interval]);
+  }, [key, isUpdate, once, updateAtInit, interval]);
 
   return [value, updateValue, clearTimer];
 }
