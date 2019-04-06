@@ -25,6 +25,9 @@ function RenderBooks({ style, loading, error, data }) {
 function HomeLocal() {
   const [localBooks, updateLocalBooks] = useDen({
     path: ['aa', 'bb', 'cc'],
+    dataSetter: data => {
+      return data;
+    },
   });
 
   return (
@@ -58,17 +61,17 @@ function HomeFetch() {
   });
 
   // 这个虽然是相同的 path, 但是不会更新, 因为设置了 isSetState:false
-  const [gqlBooks2, updateGqlBooks2] = useDen({
-    path: ['fetch-user', 'books'],
-    dataGetter: data => {
-      if (data && data.addBook) {
-        return data.addBook;
-      }
-      return data;
-    },
-    gql: `mutation fn($title: String){ addBook(title: $title){id \n title}}`,
-    isSetState: false,
-  });
+  // const [gqlBooks2, updateGqlBooks2] = useDen({
+  //   path: ['fetch-user', 'books'],
+  //   dataGetter: data => {
+  //     if (data && data.addBook) {
+  //       return data.addBook;
+  //     }
+  //     return data;
+  //   },
+  //   gql: `mutation fn($title: String){ addBook(title: $title){id \n title}}`,
+  //   isUpdate: false,
+  // });
 
   console.log('re-render');
   return (
@@ -79,7 +82,7 @@ function HomeFetch() {
           e.preventDefault();
           const input = document.querySelector('#home-fetch');
           const inputValue = input.value;
-          updateGqlBooks2({
+          updateGqlBooks({
             nextData: { title: inputValue },
             optimistic: [...(gqlBooks.data || []), { id: inputValue, title: inputValue }],
           });
@@ -148,8 +151,8 @@ function HomeGqlMutation() {
 function Home() {
   return (
     <>
-      <HomeLocal />
-      {/*<HomeFetch />*/}
+      {/*<HomeLocal />*/}
+      <HomeFetch />
       {/*<HomeGqlQuery />*/}
       {/*<HomeGqlMutation />*/}
     </>

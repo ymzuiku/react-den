@@ -31,13 +31,13 @@ export function initGraphqlConfig({ url, errorFn }) {
 }
 
 /** 请求数据并且缓存, 并且计算 loading, error, data */
-export default function({ gql, variables, path, dataGetter, oldState }) {
+export default function({ gql, variables, path, dataSetter, oldState }) {
   return new Promise(res => {
     try {
       request(config.url, gql, variables)
         .then(data => {
-          if (typeof dataGetter === 'function') {
-            data = dataGetter(data);
+          if (typeof dataSetter === 'function') {
+            data = dataSetter(data);
           }
           cache.setIn(path, { data, loading: false, error: void 0 });
           res(cache.state.getIn(path), cache.state);

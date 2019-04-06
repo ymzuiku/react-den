@@ -65,7 +65,7 @@ interface IUseDenParams {
   /** fetch 中的method, 默认为 GET */
   method: 'GET' | 'PUT' | 'POST' | 'DELETE' | any;
   /** 数据写入本地 immutable 之前进行的处理 */
-  dataGetter: Function;
+  dataSetter: Function;
   /** 乐观数据, 请求返回之前用于渲染的数据, 如果请求返回的数据和乐观数据不一致才会更新界面 */
   optimistic: Object;
   /** 请求返回之后使用解析函数的类型, 默认: 'json' */
@@ -78,19 +78,18 @@ interface IUseDenParams {
   interval: Number;
   /** 声明时是否进行更新/请求, default: false */
   updateAtInit: Boolean;
-  /** 如果希望只做请求, 不做更新, 设置成 false */
-  isSetState: Boolean;
   /** 是否在data返回之前设定loading状态 */
-  useLoading: Boolean;
+  updateAtLoading: Boolean;
+  /** 如果希望只做请求, 不做更新, 设置成 false */
+  isUpdate: Boolean;
 }
 
 interface IUpdateDenParams {
-  /**
-   * 是否进行请求之后是否更新: default: true
-   * 如果有两个 useDen 使用同一个 path, 可以让其他的 useDen 的 isSetState 变为 false, 这样可以减少相同 path 的更新
-   * */
-  nextIsSetState: Boolean;
-  /** 是否进行更新/请求, default: true */
+  /** 声明时是否进行更新/请求, default: false */
+  nextUpdateAtInit: Boolean;
+  /** 是否更新loading状态 */
+  nextUpdateAtLoading: Boolean;
+  /** 如果希望只做请求, 不做更新, 设置成 false */
   nextIsUpdate: Boolean
   /** local: 请求body中的data */
   nextData: Object;
@@ -106,8 +105,6 @@ interface IUpdateDenParams {
   nextOnce: Boolean;
   /** 乐观数据, 请求返回之前用于渲染的数据, 如果请求返回的数据和乐观数据不一致才会更新界面 */
   nextOptimistic: Object;
-  /** 是否在data返回之前设定loading状态 */
-  nextUseLoading: Boolean;
 }
 
 /** 返回 数据, 更新数据函数, 清除 Interval 事件函数 */
