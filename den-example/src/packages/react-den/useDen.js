@@ -55,7 +55,7 @@ export default function useDen({
   interval = 0,
   useLoading = false,
 }) {
-  const [value, setValue] = useState({ loading: false, error: void 0, data: void 0 });
+  const [value, setValue] = useState({ loading: false, error: void 0, data: {} });
   const [clearTimer, setClearTimer] = useState(void 0);
   const timer = useRef(void 0);
   const key = JSON.stringify(path);
