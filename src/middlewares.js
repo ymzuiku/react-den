@@ -113,7 +113,7 @@ export function middlewareAutoLocalStorage(appKey = 'react-den-key-need-replace'
   middlewareListener.isUseMiddlewareAutoLocalStorage = true;
 
   function pathToKey(path) {
-    return `|-${JSON.stringify(path)}`;
+    return `-${JSON.stringify(path)}`;
   }
 
   const pathKeys = keys.map(v => {

@@ -53,6 +53,7 @@ export default function useDen({
   isSetState = true,
   /** 重复间隔 ms, 如果>0ms才会执行 */
   interval = 0,
+  useLoading = false,
 }) {
   const [value, setValue] = useState({ loading: false, error: void 0, data: void 0 });
   const [clearTimer, setClearTimer] = useState(void 0);
@@ -72,6 +73,7 @@ export default function useDen({
         nextError = error,
         nextOnce = once,
         nextOptimistic = optimistic,
+        nextUseLoading = useLoading,
       },
       subKey,
     ) => {
@@ -119,23 +121,25 @@ export default function useDen({
       // 保存乐观之前的数据, 用于乐观失败还原
       const oldState = cache.getIn(path) || {};
 
-      // 非本地类型, 请求之前设定loading状态
-      if (nextOptimistic !== null) {
-        cache.setIn(path, {
-          data: fixDataGetter(dataGetter, nextOptimistic),
-          loading: nextLoading || false,
-          error: nextError,
-        });
-      } else if (kind !== 'local') {
-        cache.setIn(path, { loading: true });
-      }
-      // 更新本地状态
-      else {
-        cache.setIn(path, {
-          data: fixDataGetter(dataGetter, nextData),
-          loading: nextLoading || false,
-          error: nextError,
-        });
+      // 如果开启loading状态, 非本地类型, 请求之前设定loading状态
+      if (nextUseLoading) {
+        if (nextOptimistic !== null) {
+          cache.setIn(path, {
+            data: fixDataGetter(dataGetter, nextOptimistic),
+            loading: nextLoading || false,
+            error: nextError,
+          });
+        } else if (kind !== 'local') {
+          cache.setIn(path, { loading: true });
+        }
+        // 更新本地状态
+        else {
+          cache.setIn(path, {
+            data: fixDataGetter(dataGetter, nextData),
+            loading: nextLoading || false,
+            error: nextError,
+          });
+        }
       }
 
       // 同步注册的页面进行更新

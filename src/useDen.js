@@ -57,6 +57,7 @@ export default function useDen({
   const [value, setValue] = useState({ loading: false, error: void 0, data: void 0 });
   const [clearTimer, setClearTimer] = useState(void 0);
   const timer = useRef(void 0);
+  const key = JSON.stringify(path);
 
   // 减少函数重新声明
   const updateValue = useCallback(
@@ -74,8 +75,6 @@ export default function useDen({
       },
       subKey,
     ) => {
-      const key = JSON.stringify(path);
-
       // 若有once, 并且设定了节流器, 则进行拦截
       if (nextOnce && cache.throttles[key]) {
         return;
@@ -205,15 +204,13 @@ export default function useDen({
 
     // 当组件释放后, 释放setStateFunctions中的setState
     return () => {
-      const key = JSON.stringify(path);
-
       // 清空循环请求
       if (typeof clearTimer === 'function') {
         clearTimer();
       }
       delete cache.setStateFunctions[key][subKey];
     };
-  }, [isSetState, once, updateAtInit, interval]);
+  }, [key, isSetState, once, updateAtInit, interval]);
 
   return [value, updateValue, clearTimer];
 }

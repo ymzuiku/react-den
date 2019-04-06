@@ -80,6 +80,8 @@ interface IUseDenParams {
   updateAtInit: Boolean;
   /** 如果希望只做请求, 不做更新, 设置成 false */
   isSetState: Boolean;
+  /** 是否在data返回之前设定loading状态 */
+  useLoading: Boolean;
 }
 
 interface IUpdateDenParams {
@@ -104,6 +106,8 @@ interface IUpdateDenParams {
   nextOnce: Boolean;
   /** 乐观数据, 请求返回之前用于渲染的数据, 如果请求返回的数据和乐观数据不一致才会更新界面 */
   nextOptimistic: Object;
+  /** 是否在data返回之前设定loading状态 */
+  nextUseLoading: Boolean;
 }
 
 /** 返回 数据, 更新数据函数, 清除 Interval 事件函数 */
